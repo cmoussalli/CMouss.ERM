@@ -7,6 +7,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMouss.ERM.Data", "CMouss.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMouss.ERM.Portal", "CMouss.ERM.Portal\CMouss.ERM.Portal.csproj", "{12DF1296-776F-4CBB-A45C-F01F0C391D31}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMouss.ERM.APIModels", "CMouss.ERM.APIModels\CMouss.ERM.APIModels.csproj", "{87EE845C-095F-4C95-B7AA-7F13A60A6A08}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{F2257D55-9286-40F2-9EB6-27C5152C9EFF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{7FDB81B6-596D-4E1B-AD0E-BA7D666EEA62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,9 +29,18 @@ Global
 		{12DF1296-776F-4CBB-A45C-F01F0C391D31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12DF1296-776F-4CBB-A45C-F01F0C391D31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12DF1296-776F-4CBB-A45C-F01F0C391D31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87EE845C-095F-4C95-B7AA-7F13A60A6A08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87EE845C-095F-4C95-B7AA-7F13A60A6A08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87EE845C-095F-4C95-B7AA-7F13A60A6A08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87EE845C-095F-4C95-B7AA-7F13A60A6A08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FEE812B7-0011-40A1-863C-644DD4C2A6D9} = {7FDB81B6-596D-4E1B-AD0E-BA7D666EEA62}
+		{12DF1296-776F-4CBB-A45C-F01F0C391D31} = {F2257D55-9286-40F2-9EB6-27C5152C9EFF}
+		{87EE845C-095F-4C95-B7AA-7F13A60A6A08} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9E0A79B1-1F26-470D-997D-A58812D1798B}
