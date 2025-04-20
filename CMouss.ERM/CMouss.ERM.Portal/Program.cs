@@ -1,4 +1,6 @@
 using CMouss.ERM.Portal.Components;
+using CMouss.ER
+
 
 namespace CMouss.ERM.Portal
 {
@@ -29,6 +31,10 @@ namespace CMouss.ERM.Portal
             app.MapStaticAssets();
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+
+
+
+
 
             app.Run();
         }
