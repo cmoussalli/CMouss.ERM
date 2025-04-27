@@ -15,6 +15,9 @@
             const String entity = "Test";
 
             public const string Echo = Base + "/" + entity + "/Echo";
+
+            public const string TestData = Base + "/" + entity + "/TestData";
+
         }
         #endregion
 

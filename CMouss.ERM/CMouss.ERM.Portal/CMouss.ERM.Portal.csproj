@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -7,8 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CMouss.IdentityFramework.API.Models" Version="1.1.2" />
+    <PackageReference Include="CMouss.IdentityFramework.API.Serving" Version="1.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CMouss.ERM.APIModels\CMouss.ERM.APIModels.csproj" />
     <ProjectReference Include="..\CMouss.ERM.Data\CMouss.ERM.Data.csproj" />
+    <ProjectReference Include="..\CMouss.ERM.Serving\CMouss.ERM.Serving.csproj" />
   </ItemGroup>
 
 </Project>

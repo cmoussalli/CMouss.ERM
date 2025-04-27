@@ -10,19 +10,26 @@ using CMouss.ERM.Serving.Adapters;
 
 namespace CMouss.ERM.Portal.Controllers
 {
-    public class FieldTypeController : Controller
+    public class TestController : Controller
     {
         ERMDBContext db = new ERMDBContext();
 
 
         [HttpPost]
-        [Route(APIRoutes.FieldType.GetList)]
-        public async Task<ActionResult<FieldTypeResponseModels.GetAll>> GetList()
+        [Route(APIRoutes.Test.TestData)]
+        public async Task<ActionResult<GenericResponseModel>> TestData()
         {
-            FieldTypeResponseModels.GetAll result = new();
-            FieldTypeDBService svc = new FieldTypeDBService(db);
-            List<FieldType> dbResult = await svc.GetAllAsync();
-            result.FieldTypes = new FieldTypeAdapter().Convert(dbResult);
+            GenericResponseModel result = new();
+            try
+            {
+                
+
+                //db.EntityTypes.Add()
+            }
+            catch(Exception ex)
+            {
+                
+            }
 
             return Ok(result);
         }

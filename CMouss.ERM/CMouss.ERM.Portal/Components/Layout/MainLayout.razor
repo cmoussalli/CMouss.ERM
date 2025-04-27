@@ -1,23 +1,88 @@
 ﻿@inherits LayoutComponentBase
+@using System.Collections.Generic
+@using System.Threading.Tasks
+@using CMouss.ERM.Data
+@using CMouss.ERM.Data.DBModels
+@using Microsoft.EntityFrameworkCore
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@inject NavigationManager NavigationManager
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+
+<div class="d-flex flex-column h-100">
+    <!-- Top navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">CRM</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><NavLink class="nav-link" href="/">Home</NavLink></li>
+                    <li class="nav-item"><NavLink class="nav-link" href="/counter">Counter</NavLink></li>
+
+                    <li class="nav-item"><NavLink class="nav-link" href="/records">Records</NavLink></li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            User
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
+    </nav>
+    <!-- Secondary navigation buttons -->
+    <nav class="bg-light border-bottom">
+        <div class="container-fluid px-4">
+            <div class="btn-toolbar" role="toolbar">
+                <div class="btn-group me-2" role="group">
+                    @if (entityTypes != null)
+                    {
+                        @foreach (var type in entityTypes)
+                        {
+                            <NavLink class="btn btn-light btn-sm me-2" @onclick="() => NavigateToEntityType(type.Id)">@type.PluralName</NavLink>
+                        }
+                    }
+                </div>
+                <!-- add more button groups as needed -->
+            </div>
+        </div>
+    </nav>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+    <!-- Main content area -->
+    <div class="container-fluid flex-grow-1 p-4">
+        <!-- Command bar -->
+        <div class="mb-3">
+            <button class="btn btn-outline-primary btn-sm me-2">New</button>
+            <button class="btn btn-secondary btn-sm me-2">Edit</button>
+            <button class="btn btn-outline-success btn-sm">Save</button>
+        </div>
+        <!-- Page content -->
+        @Body
+    </div>
 </div>
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+<!-- Bootstrap JS -->
+<script src="/lib/bootstrap/bootstrap.bundle.min.js"></script>
+
+@code {
+    private List<EntityType>? entityTypes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var db = new ERMDBContext();
+        entityTypes = await db.EntityTypes.Where(o => o.IsDeleted != true).ToListAsync();
+    }
+
+    public async Task NavigateToEntityType(int entityTypeId )
+    {
+        NavigationManager.NavigateTo("/records?entityTypeId=" + entityTypeId.ToString());
+        StateHasChanged();
+    }
+}

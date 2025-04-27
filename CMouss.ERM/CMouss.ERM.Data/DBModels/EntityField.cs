@@ -11,16 +11,13 @@ namespace CMouss.ERM.Data.DBModels
     {
         [Key]
         public int Id { get; set; }
+        public string Name { get; set; }
         public int EntityTypeId { get; set; }
-        public string FieldName { get; set; }
         public int FieldTypeId { get; set; }
         public bool IsRequired { get; set; }
-        public string DefaultValue { get; set; }
+        public string DefaultValue { get; set; } = "";
 
-
-        //public virtual EntityType EntityType  { get; set; }
-        //public virtual FieldType FieldType { get; set; }
+        public virtual EntityType EntityType { get; set; } = null!; // Ensure non-nullable navigation property
+        public virtual FieldType FieldType { get; set; } = null!; // Ensure non-nullable navigation property
     }
-
-
 }

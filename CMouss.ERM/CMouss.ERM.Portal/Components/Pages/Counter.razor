@@ -1,7 +1,9 @@
 ﻿@page "/counter"
-@rendermode InteractiveServer
+@* @rendermode InteractiveServer *@
 
 <PageTitle>Counter</PageTitle>
+
+<button @onclick="CreateTestData">Create Test Data</button>
 
 <h1>Counter</h1>
 
@@ -16,4 +18,12 @@
     {
         currentCount++;
     }
+
+    public void CreateTestData()
+    {
+        CMouss.ERM.Data.ERMDBContext db = new();
+        db.InsertTestData();
+    }
+
+
 }

@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 
 namespace CMouss.ERM.Data.DBModels
 {
-    public class EntityFieldValue
+    public class RecordFieldValue
     {
         [Key]
         public int Id { get; set; }
-        public int EntityRecordId { get; set; }
-        public string FieldName { get; set; }
+        public int RecordId { get; set; }
+        public int EntityFieldId { get; set; }
         public string FieldValue { get; set; }
+
+        public virtual Record Record { get; set; }
+        public virtual EntityField EntityField { get; set; }
+
     }
 }

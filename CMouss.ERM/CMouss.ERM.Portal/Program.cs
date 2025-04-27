@@ -1,5 +1,9 @@
+using CMouss.ERM.Data;
 using CMouss.ERM.Portal.Components;
-using CMouss.ER
+using CMouss.ERM.Data.DBServices;
+
+using CMouss.IdentityFramework;
+using System.Reflection;
 
 
 namespace CMouss.ERM.Portal
@@ -13,6 +17,12 @@ namespace CMouss.ERM.Portal
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            // register DbContext and DB services
+            builder.Services.AddDbContext<ERMDBContext>();
+            builder.Services.AddScoped<EntityFieldDBService>();
+            builder.Services.AddScoped<RecordDBService>();
+            builder.Services.AddScoped<RecordFieldValueDBService>();
 
             var app = builder.Build();
 
@@ -29,12 +39,37 @@ namespace CMouss.ERM.Portal
             app.UseAntiforgery();
 
             app.MapStaticAssets();
-            app.MapRazorComponents<App>()
+            app.MapRazorComponents<Components.App>()
                 .AddInteractiveServerRenderMode();
 
 
 
+            bool isNewDatabase = false;
+            string filepath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\mydb.db";
+            //if (System.IO.File.Exists(filepath))
+            //{
+            //    System.IO.File.Delete(filepath);
+            //}
+                isNewDatabase = false;
+            Thread.Sleep(100);
+            IDFManager.Configure(new IDFManagerConfig
+            {
+                DatabaseType = DatabaseType.SQLite,
+                DBConnectionString = "Data Source=mydb.db;",
+                DefaultListPageSize = 25,
+                DBLifeCycle = DBLifeCycle.Both,
+                IsActiveByDefault = true,
+                IsLockedByDefault = false,
+                DefaultTokenLifeTime = new LifeTime(30, 0, 0)
+            });
 
+            ERMDBContext db = new ERMDBContext();
+            db.Database.EnsureCreated();
+
+            if (isNewDatabase)
+            {
+                db.InsertTestData();
+            }
 
             app.Run();
         }

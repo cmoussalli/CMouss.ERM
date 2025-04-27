@@ -1,0 +1,159 @@
+﻿@page "/records"
+
+
+@using CMouss.ERM.Data
+@using Microsoft.AspNetCore.WebUtilities
+@using CMouss.ERM.Data.DBModels
+@using CMouss.ERM.Data.DBServices
+@using System.Collections.Generic
+@using System.Linq
+@using System.Threading.Tasks
+@using System.Diagnostics
+
+@inject NavigationManager NavigationManager
+
+
+
+<div class="row">
+	<div class="col-lg-6">
+		<h3>@entityType.PluralName</h3>
+	</div>
+	<div class="col-lg-6">
+		<div class="input-group">
+			<input type="text" @bind="searchText" placeholder="Search records..." class="form-control"
+				   @onkeydown="HandleKeyDown" />
+			<button class="btn btn-primary" @onclick="async () => await LoadData()">Search</button>
+		</div>
+	</div>
+</div>
+<br />
+@if (!entityTypeId.HasValue)
+{
+	<p>No entity type specified.</p>
+}
+else if (entityType.EntityFields == null || records == null)
+{
+	<p>Loading records and fields...</p>
+}
+else if (!records.Any())
+{
+	<p>No records found for entity type @entityTypeId.</p>
+}
+else
+{
+
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Id</th>
+				@foreach (var fieldToShow in fieldsToShow)
+				{
+					<th>@fieldToShow.Name</th>
+				}
+				<th>Owner</th>
+				<th>Create User</th>
+				<th>Create DateTime</th>
+				<th>Last Update</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var record in records)
+			{
+				<tr>
+					<td>
+						<button @onclick="() => NavigateToDetails(record.Id)">@record.Id</button>
+					</td>
+					@foreach (var fieldToShow in fieldsToShow)
+					{
+						<td>
+							@record.RecordFieldValues.FirstOrDefault(x => x.EntityFieldId == fieldToShow.Id)?.FieldValue
+						</td>
+					}
+
+					<td>@record.OwnerUserId</td>
+					<td>@record.CreateUserId</td>
+					<td>@record.CreateDateTime</td>
+					<td>@record.LastUpdate</td>
+					<td>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+
+	[Parameter]
+	[SupplyParameterFromQuery]
+	public int? entityTypeId { get; set; }
+
+	private EntityType entityType;
+	private List<Record> records;
+	private EntityListView selectedEntityListView;
+	private List<EntityListView> entityListViews;
+	private List<EntityField> fieldsToShow;
+
+	private string searchText = string.Empty;
+
+	DBService dBService = new DBService();
+
+	// protected override async Task OnInitializedAsync()
+	// {
+	// 	await LoadPage();
+	// }
+
+	// protected override Task OnAfterRenderAsync(bool firstRender)
+	// {
+	// 	return base.OnAfterRenderAsync(firstRender);
+	// }
+
+
+	protected override async Task OnParametersSetAsync()
+	{
+		await LoadData();
+	}
+
+	public async Task LoadData()
+	{
+
+		if (entityTypeId.HasValue)
+		{
+			entityType = await dBService.EntityTypeDBService.GetByIdAsync(entityTypeId.Value);
+			entityListViews = await dBService.EntityListViewDBService.GetListByEntityTypeIdAsync(entityTypeId.Value);
+			records = await dBService.RecordDBService.GetByEntityTypeIdAsync(entityTypeId.Value, searchText);
+		}
+		else
+		{
+			entityType = null;
+			records = new List<Record>();
+		}
+
+		//Get the default listView for the entitytype
+		if (entityType.DefaultEntityListViewID.HasValue)
+		{
+			selectedEntityListView = await dBService.EntityListViewDBService.GetByIdAsync(entityType.DefaultEntityListViewID.Value);
+			fieldsToShow = selectedEntityListView.EntityListViewFields.OrderBy(o => o.SortId).Select(o => o.EntityField).ToList();
+		}
+		else
+		{
+			fieldsToShow = entityType.EntityFields.ToList();
+		}
+	}
+
+
+
+	private void NavigateToDetails(int recordId)
+	{
+		NavigationManager.NavigateTo($"records/details?id={recordId}", true);
+	}
+
+	private async Task HandleKeyDown(KeyboardEventArgs e)
+	{
+		if (e.Key == "Enter")
+		{
+			await LoadData();
+		}
+	}
+}
