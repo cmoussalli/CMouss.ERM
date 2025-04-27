@@ -125,7 +125,7 @@ namespace CMouss.ERM.Data
             {
                 Id = 1,
                 EntityTypeId = 1,
-                Name = "First Name",
+                Name = "FirstName",
                 FieldTypeId = 11,
                 IsRequired = true
             };
@@ -134,7 +134,7 @@ namespace CMouss.ERM.Data
             {
                 Id = 2,
                 EntityTypeId = 1,
-                Name = "Last Name",
+                Name = "LastName",
                 FieldTypeId = 11,
                 IsRequired = true,
             };
@@ -255,6 +255,7 @@ namespace CMouss.ERM.Data
             {
                 Id = 1,
                 EntityTypeId = 1,
+                Name = "John Doe",
                 CreateDateTime = DateTime.Now,
                 LastUpdate = DateTime.Now,
                 CreateUserId = "",
@@ -290,6 +291,7 @@ namespace CMouss.ERM.Data
             Record record2 = new()
             {
                 Id = 2,
+                Name = "Jane Smith",
                 EntityTypeId = 1,
                 CreateDateTime = DateTime.Now,
                 LastUpdate = DateTime.Now,
@@ -326,6 +328,7 @@ namespace CMouss.ERM.Data
             Record record3 = new()
             {
                     Id = 3,
+                Name = "ACME Corp",
                 EntityTypeId = 2,
                 CreateDateTime = DateTime.Now,
                 LastUpdate = DateTime.Now,

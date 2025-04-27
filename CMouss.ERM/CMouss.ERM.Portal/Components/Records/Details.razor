@@ -1,5 +1,12 @@
 ﻿@page "/records/details"
 
+@using System;
+@using System.Collections.Generic;
+@using System.Dynamic;
+@using System.Threading.Tasks;
+@using Microsoft.CodeAnalysis.CSharp.Scripting;
+@using Microsoft.CodeAnalysis.Scripting;
+
 
 @inject NavigationManager NavigationManager
 
@@ -9,133 +16,197 @@
 
 @if (isLoading)
 {
-    <p>Loading...</p>
+	<p>Loading...</p>
 }
 else if (!string.IsNullOrEmpty(errorMessage))
 {
-    <p class="text-danger">@errorMessage</p>
+	<p class="text-danger">@errorMessage</p>
 }
 else if (record == null)
 {
-    <p>Record not found.</p>
+	<p>Record not found.</p>
 }
 else
 {
-    <div>
-        <h4>Record ID: @record.Id</h4>
-        <p><strong>Entity Type:</strong> @record.EntityType?.Name</p>
-        <p><strong>Created By:</strong> @record.CreateUserId on @record.CreateDateTime.ToLocalTime()</p>
-        <p><strong>Last Updated By:</strong> @record.LastUpdateUserId on @record.LastUpdate.ToLocalTime()</p>
-        <p><strong>Owner User ID:</strong> @record.OwnerUserId</p>
 
-        <h5>Field Values</h5>
-        @if (record.RecordFieldValues.Count == 0)
-        {
-            <p>No field values found.</p>
-        }
-        else
-        {
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Field Name</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var fv in record.RecordFieldValues)
-                    {
-                        <tr>
-                            <td>@fv.EntityField?.Name</td>
-                            <td>@fv.FieldValue</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+	<input type="text" @bind-value="userCode" width="100%" />
+	<h3>@userCodeResult</h3>
+	<button @onclick="Test">Execute</button>
 
-        <h5>Relations</h5>
-        @if (record.RelatedRecords.Count == 0)
-        {
-            <p>No source relations found.</p>
-        }
-        else
-        {
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Relation Name</th>
-                        <th>Destination Record ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var rel in record.RelatedRecords)
-                    {
-                        <tr>
-                            <td>@rel.RelationTitle</td>
-                            <td>@rel.Record.Id</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
 
-      
-    </div>
+
+	<div>
+		<h4>Record ID: @record.Id</h4>
+		<p><strong>Entity Type:</strong> @record.EntityType?.Name</p>
+		<p><strong>Created By:</strong> @record.CreateUserId on @record.CreateDateTime.ToLocalTime()</p>
+		<p><strong>Last Updated By:</strong> @record.LastUpdateUserId on @record.LastUpdate.ToLocalTime()</p>
+		<p><strong>Owner User ID:</strong> @record.OwnerUserId</p>
+
+		<h5>Field Values</h5>
+		@if (record.RecordFieldValues.Count == 0)
+		{
+			<p>No field values found.</p>
+		}
+		else
+		{
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Field Name</th>
+						<th>Value</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var fv in record.RecordFieldValues)
+					{
+						<tr>
+							<td>@fv.EntityField?.Name</td>
+							<td>@fv.FieldValue</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+
+		<h5>Relations</h5>
+		@if (record.Relations.Count == 0)
+		{
+			<p>No source relations found.</p>
+		}
+		else
+		{
+
+			@foreach (var rel in record.Relations)
+			{
+				<h6>Relation: @rel.RelationTitle</h6>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Record ID</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var destRec in rel.Records)
+						{
+							<tr>
+								<td>@destRec.Id</td>
+								<td>@destRec.Name</td>
+							</tr>
+						}
+
+					</tbody>
+				</table>
+			}
+		}
+
+
+	</div>
 }
 
 
 
 @code {
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "id")]
-    public int RecordId { get; set; }
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "id")]
+	public int RecordId { get; set; }
 
-    private Record? record;
-    private bool isLoading = true;
-    private string? errorMessage;
+	private Record? record;
+	private bool isLoading = true;
+	private string? errorMessage;
 
-    DBService dBService = new();
+	DBService dBService = new();
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (RecordId <= 0)
-        {
-            errorMessage = "Invalid record ID.";
-            isLoading = false;
-            return;
-        }
+	string userCode = "";
+	string userCodeResult = "";
 
-        try
-        {
-            isLoading = true;
-            errorMessage = null;
 
-            // Load the record with related data
-            record = await dBService.RecordDBService.GetByIdWithRelationsAsync(RecordId);
-            if (record == null)
-            {
-                errorMessage = $"Record with ID {RecordId} not found.";
-                isLoading = false;
-                return;
-            }
+	protected override async Task OnParametersSetAsync()
+	{
+		if (RecordId <= 0)
+		{
+			errorMessage = "Invalid record ID.";
+			isLoading = false;
+			return;
+		}
 
-            // Load field values
-            // fieldValues = await RecordFieldValueService.GetByRecordIdAsync(RecordId);
+		try
+		{
+			isLoading = true;
+			errorMessage = null;
 
-            // // Load relations where this record is source
-            // sourceRelations = await RecordRelationService.GetBySourceRecordIdAsync(RecordId);
+			// Load the record with related data
+			record = await dBService.RecordDBService.GetByIdWithRelationsAsync(RecordId);
+			if (record == null)
+			{
+				errorMessage = $"Record with ID {RecordId} not found.";
+				isLoading = false;
+				return;
+			}
 
-            // // Load relations where this record is destination
-            // destinationRelations = await RecordRelationService.GetByDestinationRecordIdAsync(RecordId);
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error loading record details: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
+			// Load field values
+			// fieldValues = await RecordFieldValueService.GetByRecordIdAsync(RecordId);
+
+			// // Load relations where this record is source
+			// sourceRelations = await RecordRelationService.GetBySourceRecordIdAsync(RecordId);
+
+			// // Load relations where this record is destination
+			// destinationRelations = await RecordRelationService.GetByDestinationRecordIdAsync(RecordId);
+		}
+		catch (Exception ex)
+		{
+			errorMessage = $"Error loading record details: {ex.Message}";
+		}
+		finally
+		{
+			isLoading = false;
+		}
+	}
+	public class Globals
+	{
+		public dynamic input { get; set; }
+	}
+
+
+	public async Task Test()
+	{
+		dynamic fields = new ExpandoObject();
+		var fieldsDict = (IDictionary<string, object>)fields;
+
+		foreach (var field in record.RecordFieldValues)
+		{
+			fieldsDict[field.EntityField.Name] = field.FieldValue;
+		}
+
+		try
+		{
+			// 3. Execute user's code
+			var scriptOptions = ScriptOptions.Default
+					.WithReferences(
+					typeof(object).Assembly,                  // System.Private.CoreLib
+					typeof(Enumerable).Assembly,              // System.Linq
+					typeof(System.Dynamic.DynamicObject).Assembly, // System.Dynamic
+					typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly // <-- This is the key!
+						)
+						.WithImports("System", "System.Linq", "System.Dynamic");
+
+			var globs = new Globals { input = fields };
+
+			await CSharpScript.EvaluateAsync(
+				userCode,
+				scriptOptions,
+				globals: globs
+			);
+
+			// 4. Output the result
+			userCodeResult = fields.FullName;
+		}
+		catch (Exception ex)
+		{
+			userCodeResult = ex.Message;
+		}
+	}
+
+
+
+
 }

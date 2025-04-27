@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="CMouss.IdentityFramework.API.Models" Version="1.1.2" />
     <PackageReference Include="CMouss.IdentityFramework.API.Serving" Version="1.1.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.13.0" />
   </ItemGroup>
 
   <ItemGroup>

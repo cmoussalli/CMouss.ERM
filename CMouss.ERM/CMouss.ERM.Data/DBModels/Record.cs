@@ -11,6 +11,7 @@ namespace CMouss.ERM.Data.DBModels
     {
         public int Id { get; set; }
         public int EntityTypeId { get; set; }
+        public string Name { get; set; }
         public string CreateUserId { get; set; }
         public DateTime CreateDateTime { get; set; }
         public string LastUpdateUserId { get; set; }
@@ -26,47 +27,46 @@ namespace CMouss.ERM.Data.DBModels
         public virtual List<RecordRelation> RecordInverseRelations { get; set; } = new(); // Initialize collection
 
         [NotMapped]
-        public List<RelatedRecord> RelatedRecords
+        public List<Relation> Relations
         {
             get
             {
-                var relatedRecords = new List<RelatedRecord>();
+                List<Relation> relas = new();
                 if (RecordRelations.Count > 0)
                 {
-                    foreach (var recordRelation in RecordRelations)
-                    {
-                        var relatedRecord = new RelatedRecord
-                        {
-                            EntityRelationId = recordRelation.EntityRelationId,
-                            RecordRelationId = recordRelation.Id,
-                            RelationTitle = recordRelation.EntityRelation.Title_Right,
-                            IsList = recordRelation.EntityRelation.IsList_Right,
-                            IsRequired = recordRelation.EntityRelation.IsRequired_Left,
-                            Record = recordRelation.RightRecord
-                        };
-                        relatedRecords.Add(relatedRecord);
-                    }
-                }
-                   
-                if (RecordInverseRelations.Count > 0)
-                {
-                    foreach (var recordRelation in RecordInverseRelations)
-                    {
-                        var relatedRecord = new RelatedRecord
-                        {
-                            EntityRelationId = recordRelation.EntityRelationId,
-                            RecordRelationId = recordRelation.Id,
-                            RelationTitle = recordRelation.EntityRelation.Title_Left,
-                            IsList = recordRelation.EntityRelation.IsList_Left,
-                            IsRequired = recordRelation.EntityRelation.IsRequired_Right,
-                            Record = recordRelation.LeftRecord
-                        };
-                        relatedRecords.Add(relatedRecord);
-                    }
+                    var relas1 = from r in RecordRelations
+                                 group r by r.EntityRelationId into g
+                                 select new Relation
+                                 {
+                                     EntityRelationId = g.Key,
+                                     RecordRelationId = g.FirstOrDefault().Id,
+                                     RelationTitle = g.FirstOrDefault().EntityRelation.Title_Right,
+                                     IsList = g.FirstOrDefault().EntityRelation.IsList_Right,
+                                     IsRequired = g.FirstOrDefault().EntityRelation.IsRequired_Right,
+                                     Records = g.Select(x => x.RightRecord).ToList()
+                                 };
+                    relas.AddRange(relas1);
                 }
 
-                return relatedRecords;
+                if (RecordInverseRelations.Count > 0)
+                {
+                    var relas2 = from r in RecordInverseRelations
+                                 group r by r.EntityRelationId into g
+                                 select new Relation
+                                 {
+                                     EntityRelationId = g.Key,
+                                     RecordRelationId = g.FirstOrDefault().Id,
+                                     RelationTitle = g.FirstOrDefault().EntityRelation.Title_Left,
+                                     IsList = g.FirstOrDefault().EntityRelation.IsList_Left,
+                                     IsRequired = g.FirstOrDefault().EntityRelation.IsRequired_Left,
+                                     Records = g.Select(x => x.LeftRecord).ToList()
+                                 };
+                    relas.AddRange(relas2);
+                }
+
+                return relas.ToList();
             }
+
         }
 
     }
@@ -74,14 +74,14 @@ namespace CMouss.ERM.Data.DBModels
 
 
 
-    public class RelatedRecord
+    public class Relation
     {
         public int EntityRelationId { get; set; }
         public int RecordRelationId { get; set; }
         public string RelationTitle { get; set; }
         public bool IsList { get; set; }
         public bool IsRequired { get; set; }
-        public Record Record { get; set; }
+        public List<Record> Records { get; set; } = new(); // Initialize collection
 
 
 
