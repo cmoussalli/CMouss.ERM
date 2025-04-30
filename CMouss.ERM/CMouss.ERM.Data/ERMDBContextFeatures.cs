@@ -17,91 +17,91 @@ namespace CMouss.ERM.Data
             #region DataTypes
 
             //DataTypes
-            FieldType fieldType11 = new()
+            DataType fieldType11 = new()
             {
                 Id = 11,
                 Name = "SingleLine Text",
             };
-            FieldTypes.Add(fieldType11);
-            FieldType fieldType12 = new()
+            DataTypes.Add(fieldType11);
+            DataType fieldType12 = new()
             {
                 Id = 12,
                 Name = "Multiline Text",
             };
-            FieldTypes.Add(fieldType12);
+            DataTypes.Add(fieldType12);
 
 
-            FieldType fieldType31 = new()
+            DataType fieldType31 = new()
             {
                 Id = 31,
                 Name = "Number",
             };
-            FieldTypes.Add(fieldType31);
-            FieldType fieldType32 = new()
+            DataTypes.Add(fieldType31);
+            DataType fieldType32 = new()
             {
                 Id = 32,
                 Name = "NumberWithDecimals",
             };
-            FieldTypes.Add(fieldType32);
+            DataTypes.Add(fieldType32);
 
-            FieldType fieldType41 = new()
+            DataType fieldType41 = new()
             {
                 Id = 41,
                 Name = "DateTime",
             };
-            FieldTypes.Add(fieldType41);
-            FieldType fieldType42 = new()
+            DataTypes.Add(fieldType41);
+            DataType fieldType42 = new()
             {
                 Id = 42,
                 Name = "Date",
             };
-            FieldTypes.Add(fieldType42);
-            FieldType fieldType43 = new()
+            DataTypes.Add(fieldType42);
+            DataType fieldType43 = new()
             {
                 Id = 43,
                 Name = "Time",
             };
-            FieldTypes.Add(fieldType43);
+            DataTypes.Add(fieldType43);
 
 
-            FieldType fieldType51 = new()
+            DataType fieldType51 = new()
             {
                 Id = 51,
                 Name = "DropDown",
             };
-            FieldTypes.Add(fieldType51);
+            DataTypes.Add(fieldType51);
 
 
 
 
-            FieldType fieldType61 = new()
+            DataType fieldType61 = new()
             {
                 Id = 61,
                 Name = "Boolean",
             };
-            FieldTypes.Add(fieldType61);
+            DataTypes.Add(fieldType61);
 
 
-            FieldType fieldType101 = new()
+            DataType fieldType101 = new()
             {
                 Id = 101,
                 Name = "Email",
             };
-            FieldTypes.Add(fieldType101);
+            DataTypes.Add(fieldType101);
 
-            FieldType fieldType102 = new()
+            DataType fieldType102 = new()
             {
                 Id = 102,
                 Name = "URL",
             };
-            FieldTypes.Add(fieldType102);
+            DataTypes.Add(fieldType102);
 
-            FieldType fieldType103 = new()
+            DataType fieldType103 = new()
             {
                 Id = 103,
                 Name = "GeoLocation",
             };
-            FieldTypes.Add(fieldType103);
+            DataTypes.Add(fieldType103);
 
             #endregion
 
@@ -126,7 +126,7 @@ namespace CMouss.ERM.Data
                 Id = 1,
                 EntityTypeId = 1,
                 Name = "FirstName",
-                FieldTypeId = 11,
+                DataTypeId = 11,
                 IsRequired = true
             };
             EntityFields.Add(entityField101_Contact_FirstName);
@@ -135,7 +135,7 @@ namespace CMouss.ERM.Data
                 Id = 2,
                 EntityTypeId = 1,
                 Name = "LastName",
-                FieldTypeId = 11,
+                DataTypeId = 11,
                 IsRequired = true,
             };
             EntityFields.Add(entityField102_Contact_LastName);
@@ -144,7 +144,7 @@ namespace CMouss.ERM.Data
                 Id = 3,
                 EntityTypeId = 1,
                 Name = "Email",
-                FieldTypeId = 101,
+                DataTypeId = 101,
                 IsRequired = false,
             };
             EntityFields.Add(entityField103_Contact_Email);
@@ -182,7 +182,7 @@ namespace CMouss.ERM.Data
                 Id = 4,
                 EntityTypeId = 2,
                 Name = "Company Name",
-                FieldTypeId = 11,
+                DataTypeId = 11,
                 IsRequired = true,
             };
             EntityFields.Add(entityField201);

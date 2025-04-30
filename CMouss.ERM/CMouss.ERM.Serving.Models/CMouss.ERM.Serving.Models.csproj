@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CMouss.ERM.Data\CMouss.ERM.Data.csproj" />
-    <ProjectReference Include="..\CMouss.ERM.Serving.Models\CMouss.ERM.Serving.Models.csproj" />
-  </ItemGroup>
-
 </Project>

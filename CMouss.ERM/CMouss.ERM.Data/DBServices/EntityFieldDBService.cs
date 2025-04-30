@@ -30,7 +30,7 @@ namespace CMouss.ERM.Data.DBServices
         {
             EntityField response = new();
             var entityField = await _context.EntityFields
-                .Include(x => x.FieldType)
+                .Include(x => x.DataType)
                 .Include(x => x.EntityType)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (entityField != null)
@@ -50,7 +50,7 @@ namespace CMouss.ERM.Data.DBServices
                 throw new Exception("Entity Field already exist");
             }
             response.Name = name;
-            response.FieldTypeId = fieldTypeId;
+            response.DataTypeId = fieldTypeId;
             response.EntityTypeId = entityTypeId;
             response.IsRequired = isRequired;
             await _context.EntityFields.AddAsync(response);
@@ -69,7 +69,7 @@ namespace CMouss.ERM.Data.DBServices
                 throw new Exception("Entity Field not found");
             }
             entityField.Name = name;
-            entityField.FieldTypeId = fieldTypeId;
+            entityField.DataTypeId = fieldTypeId;
             entityField.EntityTypeId = entityTypeId;
             entityField.IsRequired = isRequired;
             await _context.SaveChangesAsync();

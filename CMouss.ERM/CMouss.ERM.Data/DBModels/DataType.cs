@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CMouss.ERM.Data.DBModels
 {
-    public class FieldType
+    public class DataType
     {
         public int Id { get; set; }
         public string Name { get; set; }

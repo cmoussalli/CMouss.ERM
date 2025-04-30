@@ -21,7 +21,7 @@ namespace CMouss.ERM.Data.DBServices
         public async Task<List<EntityType>> GetAllAsync()
         {
             List<EntityType> response = new();
-            var entityTypes = await _context.EntityTypes.ToListAsync();
+            var entityTypes = await _context.EntityTypes.Where( x => x.IsDeleted == false).ToListAsync();
             return response;
         }
 
@@ -73,7 +73,7 @@ namespace CMouss.ERM.Data.DBServices
             return entityType;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             var entityType = await _context.EntityTypes
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -83,10 +83,9 @@ namespace CMouss.ERM.Data.DBServices
             }
             entityType.IsDeleted = true;
             await _context.SaveChangesAsync();
-            return true;
         }
 
-        public async Task<bool> RestoreAsync(int id)
+        public async Task RestoreAsync(int id)
         {
             var entityType = await _context.EntityTypes
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -96,7 +95,6 @@ namespace CMouss.ERM.Data.DBServices
             }
             entityType.IsDeleted = false;
             await _context.SaveChangesAsync();
-            return true;
         }
 
         public async Task<List<EntityType>> GetAllDeletedAsync()

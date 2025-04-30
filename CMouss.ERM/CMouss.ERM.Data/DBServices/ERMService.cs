@@ -24,7 +24,7 @@ namespace CMouss.ERM.Data.DBServices
         public async Task<List<Record>> Search(string query)
         {
             List<Record> response = new();
-            var fieldTypes = await _context.FieldTypes.ToListAsync();
+            var fieldTypes = await _context.DataTypes.ToListAsync();
             return response;
         }
 

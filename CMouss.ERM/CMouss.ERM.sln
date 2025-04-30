@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{7FDB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMouss.ERM.Serving", "CMouss.ERM.Serving\CMouss.ERM.Serving.csproj", "{58412598-E6BA-47EB-9911-E8B48939953F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMouss.ERM.Serving.Models", "CMouss.ERM.Serving.Models\CMouss.ERM.Serving.Models.csproj", "{FEC0FCA1-E600-46C5-AA8C-71F0C48B6FA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{58412598-E6BA-47EB-9911-E8B48939953F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58412598-E6BA-47EB-9911-E8B48939953F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58412598-E6BA-47EB-9911-E8B48939953F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEC0FCA1-E600-46C5-AA8C-71F0C48B6FA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEC0FCA1-E600-46C5-AA8C-71F0C48B6FA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEC0FCA1-E600-46C5-AA8C-71F0C48B6FA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEC0FCA1-E600-46C5-AA8C-71F0C48B6FA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{12DF1296-776F-4CBB-A45C-F01F0C391D31} = {F2257D55-9286-40F2-9EB6-27C5152C9EFF}
 		{87EE845C-095F-4C95-B7AA-7F13A60A6A08} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{58412598-E6BA-47EB-9911-E8B48939953F} = {7FDB81B6-596D-4E1B-AD0E-BA7D666EEA62}
+		{FEC0FCA1-E600-46C5-AA8C-71F0C48B6FA0} = {7FDB81B6-596D-4E1B-AD0E-BA7D666EEA62}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9E0A79B1-1F26-470D-997D-A58812D1798B}

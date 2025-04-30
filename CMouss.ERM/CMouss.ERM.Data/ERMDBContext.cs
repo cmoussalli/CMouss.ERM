@@ -13,7 +13,7 @@ namespace CMouss.ERM.Data
     public partial class ERMDBContext:IDFDBContext
     {
 
-        public DbSet<FieldType> FieldTypes { get; set; }
+        public DbSet<DataType> DataTypes { get; set; }
         public DbSet<EntityType> EntityTypes { get; set; }
         public DbSet<EntityField> EntityFields { get; set; }
 

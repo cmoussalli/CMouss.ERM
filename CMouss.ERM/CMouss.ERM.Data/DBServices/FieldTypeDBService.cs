@@ -10,21 +10,21 @@ using CMouss.ERM.Data.DBModels;
 namespace CMouss.ERM.Data.DBServices
 {
 
-    public class FieldTypeDBService
+    public class DataTypeDBService
     {
         private readonly ERMDBContext _context;
 
-        public FieldTypeDBService(ERMDBContext context)
+        public DataTypeDBService(ERMDBContext context)
         {
             _context = context;
         }
 
 
 
-        public async Task<List<FieldType>> GetAllAsync()
+        public async Task<List<DataType>> GetAllAsync()
         {
-            List<FieldType> response = new();
-            var fieldTypes = await _context.FieldTypes.ToListAsync();
+            List<DataType> response = new();
+            var fieldTypes = await _context.DataTypes.ToListAsync();
             return response;
         }
 

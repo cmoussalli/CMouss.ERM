@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace CMouss.ERM.Data.DBModels
+namespace CMouss.ERM.Serving
 {
     public class EntityField
     {
-        [Key]
+
         public int Id { get; set; }
         public string Name { get; set; }
         public int EntityTypeId { get; set; }
@@ -17,7 +17,17 @@ namespace CMouss.ERM.Data.DBModels
         public bool IsRequired { get; set; }
         public string DefaultValue { get; set; } = "";
 
-        public virtual EntityType EntityType { get; set; } = null!; // Ensure non-nullable navigation property
-        public virtual DataType DataType { get; set; } = null!; // Ensure non-nullable navigation property
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public EntityType EntityType { get; set; }
+
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public DataType DataType { get; set; }
+      
+
+
+
+
     }
 }

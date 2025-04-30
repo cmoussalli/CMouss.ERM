@@ -35,8 +35,8 @@ namespace CMouss.ERM.Data
         EntityListViewFieldDBService entityViewFieldDBService;
         public EntityListViewFieldDBService EntityListViewFieldDBService { get { return entityViewFieldDBService; } }
 
-        FieldTypeDBService fieldTypeDBService;
-        public FieldTypeDBService FieldTypeDBService { get { return fieldTypeDBService; } }
+        DataTypeDBService fieldTypeDBService;
+        public DataTypeDBService DataTypeDBService { get { return fieldTypeDBService; } }
 
         RecordDBService recordDBService;
         public RecordDBService RecordDBService { get { return recordDBService; } }
@@ -62,7 +62,7 @@ namespace CMouss.ERM.Data
             entityTypeDBService = new EntityTypeDBService(context);
             entityViewDBService = new EntityListViewDBService(context);
             entityViewFieldDBService = new EntityListViewFieldDBService(context);
-            fieldTypeDBService = new FieldTypeDBService(context);
+            fieldTypeDBService = new DataTypeDBService(context);
             recordDBService = new RecordDBService(context);
             recordFieldValueDBService = new RecordFieldValueDBService(context);
             recordRelationDBService = new RecordRelationDBService(context);

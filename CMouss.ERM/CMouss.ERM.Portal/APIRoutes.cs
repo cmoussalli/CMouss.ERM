@@ -22,10 +22,10 @@
         #endregion
 
 
-        #region FieldType
-        public static class FieldType
+        #region DataType
+        public static class DataType
         {
-            const String entity = "FieldType";
+            const String entity = "DataType";
             public const string GetList = Base + "/" + entity + "/GetList";
 
 

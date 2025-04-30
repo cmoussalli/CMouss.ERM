@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace CMouss.ERM.Data.DBModels
 {
@@ -17,27 +18,19 @@ namespace CMouss.ERM.Data.DBModels
 
         public bool IsDeleted { get; set; }
 
-        public virtual List<EntityField> EntityFields { get; set; } = new();
-        public virtual List<EntityListView> EntityListViews { get; set; } = new();
-        public virtual List<Record> Records { get; set; } = new();
-
-        [ForeignKey(nameof(DefaultEntityListViewID))]
-        public virtual EntityListView? DefaultEntityListView { get; set; }
 
 
-        public virtual List<EntityRelation> EntityRelations_Left { get; set; }
-        public virtual List<EntityRelation> EntityRelation_Right { get; set; }
+        public List<EntityField> EntityFields { get; set; } = new();
 
+        public List<EntityListView> EntityListViews { get; set; } = new();
 
-        //[NotMapped]
-        //public virtual List<EntityRelation> EntityRelations
-        //{
-        //    get
-        //    {
+        public List<Record> Records { get; set; } = new();
 
-        //    }
-        //}
+        public EntityListView? DefaultEntityListView { get; set; }
 
+        public List<EntityRelation> EntityRelations_Left { get; set; }
+
+        public List<EntityRelation> EntityRelation_Right { get; set; }
 
 
     }
