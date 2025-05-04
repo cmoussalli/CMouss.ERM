@@ -40,6 +40,37 @@ namespace CMouss.ERM.Data.DBServices
             return response;
         }
 
+        public async Task<List<EntityField>> GetByEntityTypeIdAsync(int entityTypeId)
+        {
+            List<EntityField> response = new();
+            var entityFields = await _context.EntityFields
+                .Include(x => x.DataType)
+                .Include(x => x.EntityType)
+                .Where(x => x.EntityTypeId == entityTypeId)
+                .ToListAsync();
+            if (entityFields != null && entityFields.Count > 0)
+            {
+                response.AddRange(entityFields);
+            }
+            return response;
+        }
+
+        public async Task<List<EntityField>> GetByDataTypeIdAsync(int dataTypeId)
+        {
+            List<EntityField> response = new();
+            var entityFields = await _context.EntityFields
+                .Include(x => x.DataType)
+                .Include(x => x.EntityType)
+                .Where(x => x.DataTypeId == dataTypeId)
+                .ToListAsync();
+            if (entityFields != null && entityFields.Count > 0)
+            {
+                response.AddRange(entityFields);
+            }
+            return response;
+        }
+
+
         public async Task<EntityField> AddAsync(string name, int fieldTypeId, int entityTypeId, bool isRequired)
         {
             EntityField response = new();
@@ -103,6 +134,20 @@ namespace CMouss.ERM.Data.DBServices
             return true;
         }
 
+        public async Task<bool> DeleteByDataTypeIdAsync(int dataTypeId)
+        {
+            var entityFields = await _context.EntityFields
+                .Where(x => x.DataTypeId == dataTypeId)
+                .ToListAsync();
+            if (entityFields == null || entityFields.Count == 0)
+            {
+                throw new Exception("Entity Fields not found");
+            }
+            _context.EntityFields.RemoveRange(entityFields);
+            await _context.SaveChangesAsync();
+            return true;
+
+        }
 
 
 
