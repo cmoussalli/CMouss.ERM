@@ -56,15 +56,22 @@ namespace CMouss.ERM.Data.DBServices
         public async Task<EntityListViewField> AddAsync(int entityViewId, int entityFieldId)
         {
             EntityListViewField response = new();
-            var entityViewFieldExist = await _context.EntityListViewFields
+            EntityListViewField entityViewFieldExist = await _context.EntityListViewFields
                 .FirstOrDefaultAsync(x => x.EntityListViewId == entityViewId && x.EntityFieldId == entityFieldId);
             if (entityViewFieldExist != null)
             {
                 throw new Exception("Entity View Field already exist");
             }
 
+            //Get the Last entityListViewFieldSortId from thr same EntityListView
+            List<EntityListViewField> entityListViewFields = await _context.EntityListViewFields
+                .Where(x => x.EntityListViewId == entityViewId).OrderByDescending(o => o.SortId)
+                .ToListAsync();
+            int lastSortId = entityListViewFields.FirstOrDefault()?.SortId ?? 0;
+
             response.EntityListViewId = entityViewId;
             response.EntityFieldId = entityFieldId;
+            response.SortId = lastSortId + 1; //Set the SortId to the last SortId + 1
             await _context.EntityListViewFields.AddAsync(response);
             await _context.SaveChangesAsync();
             return response;
@@ -73,7 +80,7 @@ namespace CMouss.ERM.Data.DBServices
         public async Task<EntityListViewField> UpdateAsync(int id, int entityFieldId)
         {
             EntityListViewField response = new();
-            var entityViewField = await _context.EntityListViewFields
+            EntityListViewField entityViewField = await _context.EntityListViewFields
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (entityViewField == null)
             {
@@ -87,13 +94,26 @@ namespace CMouss.ERM.Data.DBServices
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var entityViewField = await _context.EntityListViewFields
+            EntityListViewField entityViewField = await _context.EntityListViewFields
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (entityViewField == null)
             {
                 throw new Exception("Entity View Field not found");
             }
             _context.EntityListViewFields.Remove(entityViewField);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteByEntityListViewIdAsync(int entityListViewId)
+        {
+            List<EntityListViewField> entityViewFields = await _context.EntityListViewFields
+                .Where(x => x.EntityListViewId == entityListViewId).ToListAsync();
+            if (entityViewFields == null || entityViewFields.Count == 0)
+            {
+                throw new Exception("Entity View Fields not found");
+            }
+            _context.EntityListViewFields.RemoveRange(entityViewFields);
             await _context.SaveChangesAsync();
             return true;
         }
