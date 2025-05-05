@@ -24,6 +24,21 @@ namespace CMouss.ERM.Data.DBServices
             return response;
         }
 
+        public async Task<List<EntityListView>> GetListByEntityTypeIdAsync(int entityTypeId)
+        {
+            List<EntityListView> response = new();
+            var entityViewFields = await _context.EntityListViewFields
+                .Include(x => x.EntityListView)
+                .Include(x => x.EntityField)
+                .Where(x => x.EntityField.EntityTypeId == entityTypeId)
+                .ToListAsync();
+            if (entityViewFields != null && entityViewFields.Count > 0)
+            {
+                response.AddRange(entityViewFields.Select(x => x.EntityListView));
+            }
+            return response;
+        }
+
         public async Task<EntityListViewField> GetByIdAsync(int id)
         {
             EntityListViewField response = new();
