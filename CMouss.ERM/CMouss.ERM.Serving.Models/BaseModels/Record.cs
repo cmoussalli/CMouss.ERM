@@ -22,11 +22,11 @@ namespace CMouss.ERM.Serving
 
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public EntityType EntityType { get; set; } = null!; // Ensure non-nullable navigation property
+        public EntityType EntityType { get; set; } 
 
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<RecordFieldValue> RecordFieldValues { get; set; } = new(); // Initialize collection
+        public List<RecordFieldValue> RecordFieldValues { get; set; } 
 
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -36,18 +36,29 @@ namespace CMouss.ERM.Serving
 
 
 
-        public class Relation
-        {
-            public int EntityRelationId { get; set; }
-            public int RecordRelationId { get; set; }
-            public string RelationTitle { get; set; }
-            public bool IsList { get; set; }
-            public bool IsRequired { get; set; }
-            public List<Record> Records { get; set; } = new(); // Initialize collection
-
-
-
-        }
 
     }
+   
+    
+    
+    
+    public class Relation
+    {
+        public int RecordRelationId { get; set; }
+
+        public int EntityRelationId { get; set; }
+        public string RelationName { get; set; }
+        public string RelationTitle { get; set; }
+        public bool IsList { get; set; }
+        public bool IsRequired { get; set; }
+
+        public List<Record> Records { get; set; }
+
+
+        public EntityType RelationEntityType { get; set; }
+
+
+    }
+
+
 }

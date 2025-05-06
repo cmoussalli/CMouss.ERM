@@ -40,10 +40,12 @@ namespace CMouss.ERM.Data.DBModels
                                  {
                                      EntityRelationId = g.Key,
                                      RecordRelationId = g.FirstOrDefault().Id,
+                                     RelationName = g.FirstOrDefault().EntityRelation.Name,
                                      RelationTitle = g.FirstOrDefault().EntityRelation.Title_Right,
                                      IsList = g.FirstOrDefault().EntityRelation.IsList_Right,
                                      IsRequired = g.FirstOrDefault().EntityRelation.IsRequired_Right,
-                                     Records = g.Select(x => x.RightRecord).ToList()
+                                     Records = g.Select(x => x.RightRecord).ToList(),
+                                     RelationEntityType = g.FirstOrDefault().EntityRelation.EntityType_Right
                                  };
                     relas.AddRange(relas1);
                 }
@@ -56,10 +58,12 @@ namespace CMouss.ERM.Data.DBModels
                                  {
                                      EntityRelationId = g.Key,
                                      RecordRelationId = g.FirstOrDefault().Id,
+                                     RelationName = g.FirstOrDefault().EntityRelation.Name,
                                      RelationTitle = g.FirstOrDefault().EntityRelation.Title_Left,
                                      IsList = g.FirstOrDefault().EntityRelation.IsList_Left,
                                      IsRequired = g.FirstOrDefault().EntityRelation.IsRequired_Left,
-                                     Records = g.Select(x => x.LeftRecord).ToList()
+                                     Records = g.Select(x => x.LeftRecord).ToList(),
+                                     RelationEntityType = g.FirstOrDefault().EntityRelation.EntityType_Left
                                  };
                     relas.AddRange(relas2);
                 }
@@ -78,11 +82,13 @@ namespace CMouss.ERM.Data.DBModels
     {
         public int EntityRelationId { get; set; }
         public int RecordRelationId { get; set; }
+        public string RelationName { get; set; }
         public string RelationTitle { get; set; }
         public bool IsList { get; set; }
         public bool IsRequired { get; set; }
-        public List<Record> Records { get; set; } = new(); // Initialize collection
 
+        public List<Record> Records { get; set; }
+        public EntityType RelationEntityType { get; set; }
 
 
     }
