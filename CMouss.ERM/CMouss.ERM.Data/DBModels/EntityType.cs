@@ -14,19 +14,22 @@ namespace CMouss.ERM.Data.DBModels
         public string Name { get; set; }
         public string PluralName { get; set; }
 
+        [ForeignKey(nameof(DefaultEntityListViewID))]
         public int? DefaultEntityListViewID { get; set; }
 
         public bool IsDeleted { get; set; }
 
 
 
+
+        [ForeignKey(nameof(DefaultEntityListViewID))]
+        public virtual EntityListView? DefaultEntityListView { get; set; }
+
+
         public List<EntityField> EntityFields { get; set; } = new();
 
         public List<EntityListView> EntityListViews { get; set; } = new();
-
         public List<Record> Records { get; set; } = new();
-
-        public EntityListView? DefaultEntityListView { get; set; }
 
         public List<EntityRelation> EntityRelations_Left { get; set; }
 

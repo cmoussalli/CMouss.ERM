@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using CMouss.ERM.Data.DBModels;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
+using System.Reflection;
 
 namespace CMouss.ERM.Data.DBServices
 {
@@ -47,6 +49,51 @@ namespace CMouss.ERM.Data.DBServices
             return records;
         }
 
+        public async Task<List<Record>> GetByEntityTypeIdAsync(int entityTypeId, string searchFor, string orderBy, int page, int pageSize, bool reverseOrder)
+        {
+            string sortOrder = reverseOrder ? "descending" : "ascending";
+            bool sortIsByFieldValues = !IsPrimaryRecordField(orderBy);
+            string sortByEntityFieldName = sortIsByFieldValues ? orderBy : null;
+
+            // Filter base query
+            var query = _context.Records
+                .Include(x => x.EntityType)
+                .Include(x => x.RecordFieldValues)
+                    .ThenInclude(rfv => rfv.EntityField)
+                .Where(x => x.EntityTypeId == entityTypeId &&
+                            x.RecordFieldValues.Any(rfv => rfv.FieldValue.Contains(searchFor)));
+
+            // Project and sort
+            var projectedQuery = query.Select(r => new
+            {
+                Record = r,
+                FieldValueForSorting = sortByEntityFieldName == null
+                    ? null
+                    : r.RecordFieldValues
+                        .Where(rfv => rfv.EntityField.Name == sortByEntityFieldName)
+                        .Select(rfv => rfv.FieldValue)
+                        .FirstOrDefault()
+            });
+
+            string dynamicSortProperty = sortByEntityFieldName != null ? "FieldValueForSorting" : $"Record.{orderBy}";
+            string dynamicSortQuery = $"{dynamicSortProperty} {sortOrder}";
+
+            var ordered = projectedQuery
+                .OrderBy(dynamicSortQuery)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize);
+
+            // Materialize the result
+            var result = await ordered
+                .Select(x => x.Record)
+                .ToListAsync();
+
+            return result;
+        }
+
+
+
+
         public async Task<Record> GetByIdAsync(int id)
         {
             Record response = new();
@@ -69,7 +116,7 @@ namespace CMouss.ERM.Data.DBServices
                 .Include(x => x.EntityType)
                 .Include(x => x.RecordFieldValues)
                     .ThenInclude(rfv => rfv.EntityField)
-                .Include(x => x.RecordRelations).ThenInclude(o=> o.RightRecord)
+                .Include(x => x.RecordRelations).ThenInclude(o => o.RightRecord)
                 .Include(x => x.RecordRelations).ThenInclude(o => o.EntityRelation)
                 .Include(x => x.RecordInverseRelations).ThenInclude(o => o.LeftRecord)
                 .Include(x => x.RecordInverseRelations).ThenInclude(o => o.EntityRelation)
@@ -320,5 +367,23 @@ namespace CMouss.ERM.Data.DBServices
                 .ToListAsync();
             return relations;
         }
+
+
+
+
+
+
+
+        private bool IsPrimaryRecordField(string fieldName)
+        {
+            if (string.IsNullOrWhiteSpace(fieldName)) return false;
+
+            return typeof(Record)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Any(prop => prop.Name.Equals(fieldName, StringComparison.OrdinalIgnoreCase));
+        }
+
+
+
     }
 }

@@ -122,7 +122,7 @@ else
 		{
 			entityType = await dBService.EntityTypeDBService.GetByIdAsync(entityTypeId.Value);
 			entityListViews = await dBService.EntityListViewDBService.GetListByEntityTypeIdAsync(entityTypeId.Value);
-			records = await dBService.RecordDBService.GetByEntityTypeIdAsync(entityTypeId.Value, searchText);
+			records = await dBService.RecordDBService.GetByEntityTypeIdAsync(entityTypeId.Value, searchText,"FirstName",1,10,false);
 		}
 		else
 		{

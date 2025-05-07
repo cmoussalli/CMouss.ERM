@@ -25,18 +25,18 @@ namespace CMouss.ERM.Serving.ServingServices
 
         public async Task<List<Record>> GetByEntityTypeIdAsync(int entityTypeId)
         {
-            List<Record> result = new();
-            var records = await db.Records
-                .Where(r => r.EntityTypeId == entityTypeId)
-                .ToListAsync();
-
-            foreach (var r in records)
-            {
-                result.Add(new Adapters.RecordAdapter().Convert(r));
-            }
-
-            return result;
+            return new Adapters.RecordAdapter().Convert(await dbService.RecordDBService.GetByEntityTypeIdAsync(entityTypeId));
         }
+
+
+        public async Task<List<Record>> GetByEntityTypeIdAsync(int entityTypeId, string searchFor)
+        {
+            return new Adapters.RecordAdapter().Convert(await dbService.RecordDBService.GetByEntityTypeIdAsync(entityTypeId, searchFor));
+        }
+
+         
+
+
 
 
     }
