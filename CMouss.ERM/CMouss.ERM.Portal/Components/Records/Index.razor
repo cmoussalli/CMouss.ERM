@@ -21,7 +21,7 @@
 	<div class="col-lg-6">
 		<div class="input-group">
 			<input type="text" @bind="searchText" placeholder="Search records..." class="form-control"
-				   @onkeydown="HandleKeyDown" />
+			@onkeydown="HandleKeyDown" />
 			<button class="btn btn-primary" @onclick="async () => await LoadData()">Search</button>
 		</div>
 	</div>
@@ -122,7 +122,13 @@ else
 		{
 			entityType = await dBService.EntityTypeDBService.GetByIdAsync(entityTypeId.Value);
 			entityListViews = await dBService.EntityListViewDBService.GetListByEntityTypeIdAsync(entityTypeId.Value);
-			records = await dBService.RecordDBService.GetByEntityTypeIdAsync(entityTypeId.Value, searchText,"FirstName",1,10,false);
+
+			//Get the list of records for the entity type
+			RecordFilterItem recordFilter1 = new RecordFilterItem(1, RecordFilterOperator.Contains, "");
+			
+			RecordFilter recordFilter = new RecordFilter() {SearchFor = searchText};
+			recordFilter.RecordFilterItems.Add(recordFilter1);
+			records = await dBService.RecordDBService.GetByEntityTypeIdAsync(entityTypeId.Value, recordFilter,"FirstName",1,10,false);
 		}
 		else
 		{

@@ -49,21 +49,55 @@ namespace CMouss.ERM.Data.DBServices
             return records;
         }
 
-        public async Task<List<Record>> GetByEntityTypeIdAsync(int entityTypeId, string searchFor, string orderBy, int page, int pageSize, bool reverseOrder)
+        public async Task<List<Record>> GetByEntityTypeIdAsync(int entityTypeId, RecordFilter recordFilter, string orderBy, int page, int pageSize, bool reverseOrder)
         {
             string sortOrder = reverseOrder ? "descending" : "ascending";
             bool sortIsByFieldValues = !IsPrimaryRecordField(orderBy);
             string sortByEntityFieldName = sortIsByFieldValues ? orderBy : null;
 
-            // Filter base query
+            // Start base query
             var query = _context.Records
                 .Include(x => x.EntityType)
                 .Include(x => x.RecordFieldValues)
                     .ThenInclude(rfv => rfv.EntityField)
-                .Where(x => x.EntityTypeId == entityTypeId &&
-                            x.RecordFieldValues.Any(rfv => rfv.FieldValue.Contains(searchFor)));
+                .Where(x => x.EntityTypeId == entityTypeId);
 
-            // Project and sort
+            // Add search term filter
+            if (!string.IsNullOrWhiteSpace(recordFilter.SearchFor))
+            {
+                query = query.Where(x => x.RecordFieldValues
+                    .Any(rfv => rfv.FieldValue.Contains(recordFilter.SearchFor)));
+            }
+
+            // Add RecordFilterItems dynamically
+            foreach (var filterItem in recordFilter.RecordFilterItems)
+            {
+                string dynamicCondition;
+
+                if (filterItem.OperatorValue == "Contains")
+                {
+                    dynamicCondition = "RecordFieldValues.Any(EntityFieldId == @0 && FieldValue.Contains(@1))";
+                }
+                else
+                {
+                    string op = filterItem.OperatorValue switch
+                    {
+                        "Equal" => "==",
+                        "NotEqual" => "!=",
+                        "GreaterThan" => ">",
+                        "LessThan" => "<",
+                        "GreaterThanOrEqual" => ">=",
+                        "LessThanOrEqual" => "<=",
+                        _ => throw new InvalidOperationException($"Unsupported operator: {filterItem.OperatorValue}")
+                    };
+
+                    dynamicCondition = $"RecordFieldValues.Any(EntityFieldId == @0 && FieldValue {op} @1)";
+                }
+
+                query = query.Where(dynamicCondition, filterItem.EntityFieldId, filterItem.FieldValue);
+            }
+
+            // Projection for sorting
             var projectedQuery = query.Select(r => new
             {
                 Record = r,
@@ -83,11 +117,7 @@ namespace CMouss.ERM.Data.DBServices
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
 
-            // Materialize the result
-            var result = await ordered
-                .Select(x => x.Record)
-                .ToListAsync();
-
+            var result = await ordered.Select(x => x.Record).ToListAsync();
             return result;
         }
 
