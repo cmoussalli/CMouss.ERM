@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CMouss.ERMUIKit.Components;
 using Microsoft.AspNetCore.Components;
 
-namespace SME.UnifiedPlatform.WebCore.UIComponents.Utility
+namespace CMouss.ERMUIKit.Components
 {
     public partial class Wizard : ComponentBase
     {

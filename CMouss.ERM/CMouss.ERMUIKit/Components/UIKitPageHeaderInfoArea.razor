@@ -1,4 +1,4 @@
-﻿@using SME.UnifiedPlatform.WebCore.UIComponents.Utility
+﻿
 @if (!string.IsNullOrEmpty(BackgroundColor_Hover) && AfterClicked is not null)
 {
     <style>
@@ -60,7 +60,7 @@
     {
         get
         {
-            if (string.IsNullOrEmpty(backgroundColor)) { return UIKitSettings.Defaults.PageHeaderInfoArea.BackgroundColor; }
+            if (string.IsNullOrEmpty(backgroundColor)) { return ERMUIKitSettings.Defaults.PageHeaderInfoArea.BackgroundColor; }
             return backgroundColor;
         }
         set { backgroundColor = value; }
@@ -84,7 +84,7 @@
     {
         get
         {
-            if (string.IsNullOrEmpty(backgroundColor_Hover)) { return UIKitSettings.Defaults.PageHeaderInfoArea.BackgroundColor_Hover; }
+            if (string.IsNullOrEmpty(backgroundColor_Hover)) { return ERMUIKitSettings.Defaults.PageHeaderInfoArea.BackgroundColor_Hover; }
             return backgroundColor_Hover;
         }
         set { backgroundColor_Hover = value; }
@@ -113,9 +113,9 @@
 
             if (AfterClicked is not null)
             {
-                return UIKitSettings.Defaults.Generics.LinkColor;
+                return ERMUIKitSettings.Defaults.Generics.LinkColor;
             }
-            return UIKitSettings.Defaults.PageHeaderInfoArea.FontColor;
+            return ERMUIKitSettings.Defaults.PageHeaderInfoArea.FontColor;
 
         }
         set { fontColor = value; }

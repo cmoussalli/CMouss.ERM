@@ -111,7 +111,7 @@
     {
         get
         {
-            if (borderColor is null) { return UIKitSettings.Defaults.Stage.BorderColor; }
+            if (borderColor is null) { return ERMUIKitSettings.Defaults.Stage.BorderColor; }
             return borderColor;
         }
         set { borderColor = value; }
@@ -123,7 +123,7 @@
     {
         get
         {
-            if (stageHeight is 0) { return UIKitSettings.Defaults.Stage.Height; }
+            if (stageHeight is 0) { return ERMUIKitSettings.Defaults.Stage.Height; }
             return stageHeight;
         }
         set
@@ -145,7 +145,7 @@
             }
             else
             {
-                stageHeight_STR = UIKitSettings.Defaults.Stage.Height.ToString() + "px";
+                stageHeight_STR = ERMUIKitSettings.Defaults.Stage.Height.ToString() + "px";
             }
             return stageHeight_STR;
         }
