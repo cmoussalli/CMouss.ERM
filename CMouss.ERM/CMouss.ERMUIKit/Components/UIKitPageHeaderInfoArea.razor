@@ -1,0 +1,155 @@
+﻿@using SME.UnifiedPlatform.WebCore.UIComponents.Utility
+@if (!string.IsNullOrEmpty(BackgroundColor_Hover) && AfterClicked is not null)
+{
+    <style>
+        # @RandomID :hover {
+            background-color: @BackgroundColor_Hover;
+        }</style>
+}
+
+<div id="@RandomID" class="col-md" style="border-right: 1px solid; @BackgroundColorStyle @ExtraStyle0 @ExtraStyle }" onclick="@AfterClicked">
+    <div class="=row">
+        <label class="form-label">@Title</label>
+        <div>
+            <h5 class="form-label" style="color:@FontColor">
+                @if (ColorStyle != BSColorStyle.normal)
+                {
+                    <span class="badge rounded-pill bg-@ColorStyle">
+                        @Value
+                    </span>
+                }
+                else
+                {
+                    @Value
+                }
+            </h5>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public Action AfterClicked { get; set; }
+
+    public string ExtraStyle0
+    {
+        get
+        {
+            if (AfterClicked is not null)
+            {
+                return "cursor:pointer;";
+            }
+            return "";
+        }
+    }
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public string ExtraStyle { get; set; }
+
+    [Parameter]
+    public BSColorStyle ColorStyle { get; set; } = BSColorStyle.normal;
+
+    [Parameter]
+    public string BackgroundColor
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(backgroundColor)) { return UIKitSettings.Defaults.PageHeaderInfoArea.BackgroundColor; }
+            return backgroundColor;
+        }
+        set { backgroundColor = value; }
+    }
+    string backgroundColor = "";
+    public string BackgroundColorStyle
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(BackgroundColor))
+            {
+                return "background-color:" + BackgroundColor + ";";
+            }
+            return "";
+        }
+    }
+
+
+    [Parameter]
+    public string BackgroundColor_Hover
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(backgroundColor_Hover)) { return UIKitSettings.Defaults.PageHeaderInfoArea.BackgroundColor_Hover; }
+            return backgroundColor_Hover;
+        }
+        set { backgroundColor_Hover = value; }
+    }
+    string backgroundColor_Hover = "";
+    public string BackgroundColor_Hover_Style
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(BackgroundColor_Hover) && AfterClicked is not null)
+            {
+                return "#@" + RandomID + ":hover {background-color:" + BackgroundColor_Hover + ";";
+            }
+            return "";
+        }
+    }
+
+
+    [Parameter]
+    public string FontColor
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(fontColor)) { return fontColor; }
+
+
+            if (AfterClicked is not null)
+            {
+                return UIKitSettings.Defaults.Generics.LinkColor;
+            }
+            return UIKitSettings.Defaults.PageHeaderInfoArea.FontColor;
+
+        }
+        set { fontColor = value; }
+    }
+    string fontColor;
+
+
+    [Parameter]
+    public int LanguageID { get; set; }
+
+
+
+
+    public string RandomID { get; set; } = "InfoArea" + new Random().Next(1, 10000).ToString();
+
+    protected override async Task OnInitializedAsync()
+    {
+        StateHasChanged();
+    }
+
+    // string style1, style2 = "";
+    // private void AddStyles()
+    // {
+    //     style1 = "";
+    //     style2 = "";
+    //     if (LanguageID == 2)
+    //     {
+    //         style1 = "border-right: 1px solid; color:dimgrey";
+    //     }
+    //     else
+    //     {
+    //         style2 = "border-right: 1px solid; color:dimgrey";
+    //     }
+    // }
+
+
+}

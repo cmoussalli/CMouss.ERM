@@ -18,4 +18,8 @@
     <ProjectReference Include="..\CMouss.ERM.Serving\CMouss.ERM.Serving.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ERMUIKit\" />
+  </ItemGroup>
+
 </Project>

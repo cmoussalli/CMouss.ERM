@@ -1,0 +1,36 @@
+﻿<button type="button" class="btn-neon-parent btn-neon me-2" @onclick="() => OnClickButton()">
+    <span title="@ToolTipText"><i class="@IconClass"></i></span>
+</button>
+
+
+@code {
+
+    [Parameter] public string IconClass { get; set; }
+
+    [Parameter] public string ToolTipText { get; set; }
+
+    [Parameter]
+    public BSColorStyle ColorStyle
+    {
+        set
+        {
+            if (value == BSColorStyle.normal)
+            {
+                colorStyle = "";
+            }
+            else
+            {
+                colorStyle = value.ToString();
+            }
+        }
+    }
+    private string colorStyle = "";
+
+    [Parameter] public Action AfterClicked { get; set; }
+
+    public void OnClickButton()
+    {
+        this.AfterClicked.Invoke();
+    }
+
+}

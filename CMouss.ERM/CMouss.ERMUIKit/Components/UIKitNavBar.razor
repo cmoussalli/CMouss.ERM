@@ -1,0 +1,19 @@
+﻿<div class="row">
+    <div class="col-12">
+        <ul class="nav nav-tabs">
+        </ul>
+        <nav class="navbar navbar-light justify-content-between">
+            <div class="form-inline">
+                @PrimaryFragment
+            </div>
+            <div class="form-inline">
+                @SecondaryFragment
+            </div>
+        </nav>
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment PrimaryFragment { get; set; }
+    [Parameter] public RenderFragment SecondaryFragment { get; set; }
+}

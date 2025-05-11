@@ -54,6 +54,7 @@ else
 					<tr>
 						<th>Field Name</th>
 						<th>Value</th>
+						<th>Data Type</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -62,6 +63,7 @@ else
 						<tr>
 							<td>@fv.EntityField?.Name</td>
 							<td>@fv.FieldValue</td>
+							<td>@fv.EntityField.DataType.Id \ @fv.EntityField.DataType.Name</td>
 						</tr>
 					}
 				</tbody>

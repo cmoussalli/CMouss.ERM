@@ -1,0 +1,63 @@
+﻿@implements IAsyncDisposable
+
+@{
+    var css = "tab-pane";
+
+    if (Active)
+    {
+        css += " active show";
+    }
+}
+
+<div class="@css" role="tabpanel" style="height:@StageHeight_STR;overflow:hidden">
+    <div class="rowuikit col-12" style="height:@StageHeight_STR; overflow:hidden">
+        @if (Active)
+        {
+            @ChildContent
+        }
+    </div>
+</div>
+
+
+
+@code {
+
+
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter]
+    public UIKitStage ParentTabs { get; set; }
+    public string StageHeight_STR { get { return ParentTabs.StageHeight_STR; } }
+
+    public bool Active
+        =>
+
+        ParentTabs.SelectedTab == Title;
+
+
+    public async Task OnTabClicked()
+    {
+        if (ParentTabs != null)
+        {
+            await ParentTabs.ChangeSelectedTab(Title);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ParentTabs != null)
+        {
+            await ParentTabs.AddTab(this);
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    public ValueTask DisposeAsync()
+        => ParentTabs != null ? new ValueTask(ParentTabs.RemoveTab(this)) : new ValueTask(Task.CompletedTask);
+}

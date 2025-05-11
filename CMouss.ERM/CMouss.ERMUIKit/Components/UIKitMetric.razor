@@ -1,0 +1,18 @@
+﻿
+<br />
+<h5 class="card-title form-label">@Title</h5>
+<div class="row">
+    <div class="row my-auto d-flex align-items-end">
+        <p class="h1">
+            <span class="pl-4 form-label">@Value</span>
+            <span class="h6 align-baseline ms-1 form-label">@Unit</span>
+        </p>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Value { get; set; }
+    [Parameter] public string Unit { get; set; }
+
+}

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CMouss.ERM.Data.DBModels;
 using CMouss.ERM.Data.DBServices;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace CMouss.ERM.Data
 {
@@ -68,9 +70,28 @@ namespace CMouss.ERM.Data
             recordRelationDBService = new RecordRelationDBService(context);
             testDBService = new TestDBService(context);
 
+
+            RefreshMasterData();
         }
 
+        public void RefreshMasterData()
+        {
+            try
+            {
+                List<DataType> dataTypes = DataTypeDBService.GetAllAsync().Result;
+                List<EntityField> entityFields = EntityFieldDBService.GetAllAsync().Result;
+                List<EntityType> entityTypes = EntityTypeDBService.GetAllAsync().Result;
+                List<EntityListView> entityViews = EntityListViewDBService.GetAllAsync().Result;
+                List<EntityListViewField> entityViewFields = EntityListViewFieldDBService.GetAllAsync().Result;
+                List<EntityRelation> entityRelations = EntityRelationDBService.GetAllAsync().Result;
 
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while refreshing master data", ex);
+            }
+        }
 
 
     }

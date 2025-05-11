@@ -1,0 +1,26 @@
+﻿@if (IsSpecialButtonRequired)
+{
+    <button type="button" class="btn-neon-parent btn-neon me-2" @attributes="@InputAttributes" @onclick="() => OnClickButton()"><i class="bx bx-check-double label-icon"></i> @Title</button>
+}
+else
+{
+    <button type="button" class="btn-neon-parent btn-neon me-2" @attributes="@InputAttributes" @onclick="() => OnClickButton()">@Title</button>
+}
+
+@code {
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> InputAttributes { get; set; }
+
+    [Parameter] public string Title { get; set; }
+
+    [Parameter] public Action AfterClicked { get; set; }
+
+    [Parameter] public bool IsSpecialButtonRequired { get; set; } = false;
+
+    public void OnClickButton()
+    {
+        this.AfterClicked.Invoke();
+    }
+
+}

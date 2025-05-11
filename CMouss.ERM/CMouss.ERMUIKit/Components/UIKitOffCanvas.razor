@@ -1,0 +1,77 @@
+﻿@inject IJSRuntime JS
+@using System.ComponentModel;
+
+<div class="offcanvas @GetEnumDescription(CanvasPosition)" tabindex="-1" id="@Id" aria-labelledby="offcanvasTopLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasTopLabel">@ModalHeader</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"><b style="color:black">X</b></button>
+    </div>
+    <div class="offcanvas-body">
+        @ModalBody
+    </div>
+    <div class="offcanvas-footer">
+        @ModalFooter
+    </div>
+</div>
+
+
+@code {
+
+    private string id;
+
+    [Parameter]
+    public string Id
+    {
+        get { return id; }
+        set { id = "Canvas_" + IdNumber.ToString(); }
+    }
+    [Parameter]
+    public CanvasPositions CanvasPosition { get; set; }
+
+    [Parameter]
+    public string ModalHeader { get; set; }
+
+    [Parameter]
+    public RenderFragment ModalFooter { get; set; }
+
+    [Parameter]
+    public RenderFragment ModalBody { get; set; }
+
+    public string IdNumber = "";
+
+    Random random = new Random();
+    protected override async Task OnInitializedAsync()
+    {
+        random = new();
+        int randomNumber = random.Next(0, 10000);
+        id = "Canvas_" + randomNumber.ToString();
+
+
+    }
+
+    public async Task Toggle()
+    {
+        await JS.InvokeVoidAsync("CanvasShow", Id);
+    }
+
+    static string GetEnumDescription(Enum value)
+    {
+        var fieldInfo = value.GetType().GetField(value.ToString());
+
+        if (fieldInfo != null)
+        {
+            var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            if (attributes.Length > 0)
+            {
+                return attributes[0].Description;
+            }
+        }
+
+        return value.ToString();
+    }
+
+
+
+
+
+}

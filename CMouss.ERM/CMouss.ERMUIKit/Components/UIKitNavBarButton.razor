@@ -1,0 +1,35 @@
+﻿<button type="button" class="btn btn-@colorStyle waves-effect waves-light me-2" @attributes="@InputAttributes" @onclick="() => OnClickButton()">@Title</button>
+
+@code {
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> InputAttributes { get; set; }
+
+
+    [Parameter] public string Title { get; set; }
+
+    [Parameter]
+    public BSColorStyle ColorStyle
+    {
+        set
+        {
+            if (value == BSColorStyle.normal)
+            {
+                colorStyle = "";
+            }
+            else
+            {
+                colorStyle = value.ToString();
+            }
+        }
+    }
+    private string colorStyle = "";
+
+    [Parameter] public Action AfterClicked { get; set; }
+
+    public void OnClickButton()
+    {
+        this.AfterClicked.Invoke();
+    }
+
+}

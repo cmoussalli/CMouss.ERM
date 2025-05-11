@@ -1,0 +1,103 @@
+﻿<div class="col-md-@Size" style=" position:relative;background-color: @backgroundColor; @ExtraStyle0 @ExtraStyle @seperatorCss" onclick="@AfterClicked">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <div style="height:@StageContentHeight_STR;overflow-x:hidden;overflow-y:auto">
+            @if (EnableContentContainer)
+            {
+                <UIKitContentContainer>@ChildContent</UIKitContentContainer>
+            }
+            else
+            {
+                @ChildContent
+            }
+        </div>
+        <div style="bottom:0;text-align:center; position:absolute;width:100%;background-color:#f2f2f5;">
+            <span style="font-weight: 500;">@Title</span>
+        </div>
+    }
+    else
+    {
+        <div style="height:@StageHeight_STR;overflow-x:hidden;overflow-y:auto">
+            @if (EnableContentContainer)
+            {
+                <UIKitContentContainer>@ChildContent</UIKitContentContainer>
+            }
+            else
+            {
+                @ChildContent
+            }
+        </div>
+    }
+</div>
+
+
+@code {
+    [CascadingParameter]
+    public UIKitStage ParentTabs { get; set; }
+    public string StageContentHeight_STR { get { return (ParentTabs.StageHeight - 20).ToString() + "px"; } }
+    public string StageHeight_STR { get { return (ParentTabs.StageHeight).ToString() + "px"; } }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public int Size { get; set; } = 12;
+
+    [Parameter]
+    public string BackGroundColor { get; set; }
+
+    [Parameter]
+    public bool EnableContentContainer { get; set; } = true;
+
+    [Parameter]
+    public bool IsSeperatorRequired { get; set; } = true;
+
+    string backgroundColor;
+    string seperatorCss;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (BackGroundColor is null)
+        {
+            backgroundColor = UIKitSettings.Defaults.StageTabBox.BackgroundColor;
+        }
+        else
+        {
+            backgroundColor = BackGroundColor;
+        }
+        if (IsSeperatorRequired)
+        {
+            seperatorCss = "border-left: 1px dashed #333";
+        }
+        else
+        {
+            seperatorCss = "";
+        }
+    }
+
+    [Parameter]
+    public string ExtraStyle { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public Action AfterClicked { get; set; }
+    public void OnClick()
+    {
+        this.AfterClicked.Invoke();
+    }
+    public string ExtraStyle0
+    {
+        get
+        {
+            if (AfterClicked is not null)
+            {
+                return "cursor:pointer;";
+            }
+            return "";
+        }
+    }
+
+
+}

@@ -1,0 +1,60 @@
+﻿<div class="row">
+    <div class="col-md-5" style="@style1">
+        <div class="=row">
+            <label class="form-label" style="color: darkgrey">@SubTitle</label>
+            <div>
+                <h2 class="form-label">
+                    @if (!string.IsNullOrEmpty(Title))
+                    {
+                        @Title
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    @ChildContent
+
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string SubTitle { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public int LanguageID { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        AddStyles();
+        StateHasChanged();
+    }
+
+    string style1, style2 = "";
+    private void AddStyles()
+    {
+        style1 = "";
+        style2 = "";
+        if (LanguageID == 2)
+        {
+            style1 = "border-right: 1px solid; color:dimgrey";
+        }
+        else
+        {
+            style2 = "border-right: 1px solid; color:dimgrey";
+        }
+    }
+
+
+}

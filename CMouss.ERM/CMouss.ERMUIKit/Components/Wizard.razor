@@ -1,0 +1,31 @@
+﻿<CascadingValue Value="this">
+    <div id="@Id">
+        <ul class="twitter-bs-wizard-nav nav-justified nav nav-pills">
+            @foreach (var step in Steps)
+            {
+                <li id="step-@(StepsIndex(step) + 1)" class="nav-item @((step.IsEnabled == true) ? "" : "disabled")">
+                    <a class="nav-link @((ActiveStep == step) ? "active" : "")" href="javascript: void(0)"
+                       @onclick="@(e=> SetActive(step))">@step.Name</a>
+                </li>
+            }
+        </ul>
+        <div id="container-fluid">
+            <div id="bar" class="progress mt-4">
+                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" style="width: @ProgressPercent"></div>
+            </div>
+            @ChildContent
+        </div>
+    </div>
+    @if (ActiveStepIx == 0 || ActiveStepIx == 1)
+    {
+        <button class="btn btn-primary btn-lg" style="background-color:#818487; border-radius:5px; color:white" type="button"
+                disabled="@(ActiveStepIx == 0)" @onclick="GoBack">
+            السابق
+        </button>
+        <button class="btn btn-lg" style="background-color:#a58d63; border-radius:5px; color:white"
+                type="@(IsLastStep ? "تسليم" : "button")" @onclick="GoNext">
+            @(IsLastStep ? "تسليم" : "التالي")
+        </button>
+    }
+</CascadingValue>
+

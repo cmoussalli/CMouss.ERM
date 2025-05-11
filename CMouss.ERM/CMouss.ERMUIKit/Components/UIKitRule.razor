@@ -1,0 +1,66 @@
+﻿
+<div class="row mb-3">
+    <div class="col-@TitleColumnSize"><i class="mdi @statusTypeStyle"></i><label class="form-label ms-2">@Title</label></div>
+    @if (isClickable)
+    {
+        <div class="col-@TextColumnSize">
+            <a style="color: royalblue; " @onclick="() => OnClickButton()"><label class="form-label" style="cursor:pointer">@Text</label></a>
+        </div>
+    }
+    else
+    {
+        <div class="col-@TextColumnSize"><label class="form-label">@Text</label></div>
+    }
+</div>
+
+
+
+@code {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Text { get; set; }
+    [Parameter]
+    public RuleStatusType StatusType
+    {
+        get { return statusType; }
+
+        set
+        {
+            statusType = value;
+            if (value == RuleStatusType.Success)
+            {
+                statusTypeStyle = " mdi-check";
+            }
+            else if (value == RuleStatusType.Failure)
+            {
+                statusTypeStyle = " mdi-close";
+            }
+            else
+            {
+                statusTypeStyle = " mdi-circle-medium";
+            }
+        }
+    }
+    private RuleStatusType statusType;
+    private string statusTypeStyle = "";
+
+    [Parameter] public Action AfterClicked { get; set; }
+    [Parameter] public int TitleColumnSize { get; set; } = 6;
+    [Parameter] public int TextColumnSize { get; set; } = 6;
+
+    private bool isClickable
+    {
+        get
+        {
+            if (AfterClicked is not null)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public void OnClickButton()
+    {
+        this.AfterClicked.Invoke();
+    }
+}
