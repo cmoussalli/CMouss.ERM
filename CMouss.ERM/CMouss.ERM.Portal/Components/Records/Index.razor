@@ -12,7 +12,7 @@
 
 @inject NavigationManager NavigationManager
 
-
+<button @onclick="() => StateHasChanged()">RRR</button>
 
 <div class="row">
 	<div class="col-lg-6">
@@ -31,7 +31,7 @@
 {
 	<p>No entity type specified.</p>
 }
-else if (entityType.EntityFields == null || records == null)
+else if (entityType.EntityFields == null || records == null || isLoading)
 {
 	<p>Loading records and fields...</p>
 }
@@ -45,15 +45,37 @@ else
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>Id</th>
+				<Grid_TH FieldName="id" Title="Id"
+						 SelectedSortBy="@orderByField" SelectedSortIsReversed="@orderByIsReversed" SortChanged="OnSortChanged" />
+
+				<Grid_TH FieldName="name" Title="Name"
+				SelectedSortBy="@orderByField" SelectedSortIsReversed="@orderByIsReversed" SortChanged="OnSortChanged" />
+
 				@foreach (var fieldToShow in fieldsToShow)
 				{
-					<th>@fieldToShow.Name</th>
+					<Grid_TH FieldName="@fieldToShow.Name" Title="@fieldToShow.Name"
+							 SelectedSortBy="@orderByField" SelectedSortIsReversed="@orderByIsReversed" SortChanged="OnSortChanged" />
 				}
-				<th>Owner</th>
-				<th>Create User</th>
-				<th>Create DateTime</th>
-				<th>Last Update</th>
+
+				<Grid_TH FieldName="owner" Title="Owner"
+						 SelectedSortBy="@orderByField" SelectedSortIsReversed="@orderByIsReversed" SortChanged="OnSortChanged" />
+
+
+				<Grid_TH FieldName="CreateUserId" Title="Created By"
+				SelectedSortBy="@orderByField" SelectedSortIsReversed="@orderByIsReversed" SortChanged="OnSortChanged" />
+
+				<Grid_TH FieldName="CreateDateTime" Title="Creation Date"
+				SelectedSortBy="@orderByField" SelectedSortIsReversed="@orderByIsReversed" SortChanged="OnSortChanged" />
+
+
+
+				<Grid_TH FieldName="LastUpdateUserId" Title="Last Update By"
+						 SelectedSortBy="@orderByField" SelectedSortIsReversed="@orderByIsReversed" SortChanged="OnSortChanged" />
+
+				<Grid_TH FieldName="LastUpdate" Title="Last Update Date"
+						 SelectedSortBy="@orderByField" SelectedSortIsReversed="@orderByIsReversed" SortChanged="OnSortChanged" />
+
+
 				<th>Actions</th>
 			</tr>
 		</thead>
@@ -63,6 +85,18 @@ else
 				<tr>
 					<td>
 						<button @onclick="() => NavigateToDetails(record.Id)">@record.Id</button>
+					</td>
+					<td>
+						<a href="#" @onclick="() => NavigateToDetails(record.Id)">
+							@if (string.IsNullOrEmpty(record.Name))
+							{
+								@record.Id
+							}
+							else
+							{
+								@record.Name
+							}
+						</a>
 					</td>
 					@foreach (var fieldToShow in fieldsToShow)
 					{
@@ -74,6 +108,7 @@ else
 					<td>@record.OwnerUserId</td>
 					<td>@record.CreateUserId</td>
 					<td>@record.CreateDateTime</td>
+					<td>@record.LastUpdateUserId</td>
 					<td>@record.LastUpdate</td>
 					<td>
 					</td>
@@ -96,6 +131,10 @@ else
 	private List<EntityField> fieldsToShow;
 
 	private string searchText = string.Empty;
+	private string orderByField = "id";
+	// private string orderByDirection = "ascending"; // ascending or descending
+	private bool orderByIsReversed = false;
+	private bool isLoading = true;
 
 	DBService dBService = new DBService();
 
@@ -117,7 +156,8 @@ else
 
 	public async Task LoadData()
 	{
-
+		isLoading = true;
+		StateHasChanged();
 		if (entityTypeId.HasValue)
 		{
 			entityType = await dBService.EntityTypeDBService.GetByIdAsync(entityTypeId.Value);
@@ -125,10 +165,10 @@ else
 
 			//Get the list of records for the entity type
 			RecordFilterItem recordFilter1 = new RecordFilterItem(1, RecordFilterOperator.Contains, "");
-			
-			RecordFilter recordFilter = new RecordFilter() {SearchFor = searchText};
+
+			RecordFilter recordFilter = new RecordFilter() { SearchFor = searchText };
 			recordFilter.RecordFilterItems.Add(recordFilter1);
-			records = await dBService.RecordDBService.GetByEntityTypeIdAsync(entityTypeId.Value, recordFilter,"FirstName",1,10,false);
+			records = await dBService.RecordDBService.GetByEntityTypeIdAsync(entityTypeId.Value, recordFilter, orderByField, 1, 10, orderByIsReversed);
 		}
 		else
 		{
@@ -146,13 +186,15 @@ else
 		{
 			fieldsToShow = entityType.EntityFields.ToList();
 		}
+		isLoading = false;
+		StateHasChanged();
 	}
 
 
 
 	private void NavigateToDetails(int recordId)
 	{
-		NavigationManager.NavigateTo($"records/details?id={recordId}", true);
+		NavigationManager.NavigateTo($"records/details?id={recordId}", false);
 	}
 
 	private async Task HandleKeyDown(KeyboardEventArgs e)
@@ -161,5 +203,51 @@ else
 		{
 			await LoadData();
 		}
+	}
+
+	private async Task SortByClicked(string fieldName)
+	{
+		if (orderByField.ToLower() == fieldName.ToLower())
+		{
+			if (orderByIsReversed == false) { orderByIsReversed = true; } else { orderByIsReversed = false; }
+		}
+		else
+		{
+			orderByIsReversed = false;
+		}
+
+		orderByField = fieldName;
+		await LoadData();
+	}
+	private async Task SortByClicked(string fieldName, bool isReversed)
+	{
+		orderByField = fieldName;
+		orderByIsReversed = isReversed;
+		await LoadData();
+	}
+
+	private async Task OnSortChanged(Grid_TH.SortEventArgs e)
+	{
+		await SortByClicked(e.Field, e.IsReversed);
+	}
+
+
+
+	private string THCssGenerator(string fieldName)
+	{
+		string result = "arrow";
+		if (orderByField.ToLower() == fieldName.ToLower())
+		{
+			if (orderByIsReversed)
+			{
+				result = "arrow desc";
+			}
+			else
+			{
+				result = "arrow asc";
+			}
+		}
+
+		return result;
 	}
 }

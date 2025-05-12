@@ -1,2 +1,24 @@
 /* Bootstrap CSS */
 @import url("/lib/bootstrap/bootstrap.min.css");
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+th {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+    th .arrow {
+        font-size: 0.7em;
+        margin-left: 4px;
+    }

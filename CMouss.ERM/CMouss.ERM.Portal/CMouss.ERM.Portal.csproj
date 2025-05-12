@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Components\_UIKit\" />
     <Folder Include="ERMUIKit\" />
   </ItemGroup>
 

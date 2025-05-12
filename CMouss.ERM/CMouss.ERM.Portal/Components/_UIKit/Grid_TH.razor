@@ -1,0 +1,63 @@
+﻿<th @onclick='() => HandleClick()'>
+	@Title
+	@if (SelectedSortBy.ToLower() == FieldName.ToLower())
+	{
+		if (SelectedSortIsReversed)
+		{
+			<span class="arrow">▼</span>
+		}
+		else
+		{
+			<span class="arrow">▲</span>
+		}
+	}
+</th>
+
+@code {
+	[Parameter]
+	[EditorRequired]
+	public string SelectedSortBy { get; set; }
+
+	[Parameter]
+	[EditorRequired]
+	public bool SelectedSortIsReversed { get; set; }
+
+
+	[Parameter]
+	[EditorRequired]
+	public string FieldName { get; set; }
+
+	[Parameter]
+	[EditorRequired]
+	public string Title { get; set; }
+
+
+
+
+	[Parameter] public EventCallback<SortEventArgs> SortChanged { get; set; }
+
+	private async Task HandleClick()
+	{
+		bool newIsRevered = false;
+		if (!SelectedSortIsReversed)
+		{
+			newIsRevered = true;
+		}
+
+
+		var args = new SortEventArgs
+			{
+				Field = FieldName,
+				IsReversed = newIsRevered
+			};
+			StateHasChanged();
+		await SortChanged.InvokeAsync(args);
+	}
+
+
+	public class SortEventArgs
+	{
+		public string Field { get; set; }
+		public bool IsReversed { get; set; }
+	}
+}
