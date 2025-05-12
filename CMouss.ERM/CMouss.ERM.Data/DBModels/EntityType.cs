@@ -17,7 +17,9 @@ namespace CMouss.ERM.Data.DBModels
         [ForeignKey(nameof(DefaultEntityListViewID))]
         public int? DefaultEntityListViewID { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
+        public string PostUpdateScript { get; set; } = string.Empty;
 
 
 

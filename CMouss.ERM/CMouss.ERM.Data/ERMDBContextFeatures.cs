@@ -116,6 +116,7 @@ namespace CMouss.ERM.Data
                 Id = 1,
                 Name = "Contact",
                 PluralName = "Contacts",
+                PostUpdateScript = "r.Email = r.LastName + \", \" + r.FirstName;",
                 IsDeleted = false,
             };
             EntityTypes.Add(entityType1_Contact);

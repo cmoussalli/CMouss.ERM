@@ -21,6 +21,8 @@ namespace CMouss.ERM.Serving
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? DefaultEntityListViewID { get; set; }
 
+        public string PostUpdateScript { get; set; }
+
         public bool IsDeleted { get; set; }
 
 

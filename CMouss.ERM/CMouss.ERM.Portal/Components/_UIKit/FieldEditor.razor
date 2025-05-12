@@ -1,0 +1,90 @@
+﻿<div class="mb-3">
+	<label for="@FieldName" class="form-label">
+		@Title
+		@if (IsRequired)
+		{
+			<span class="text-danger">*</span>
+		}
+	</label>
+
+	@if (IsCheckbox)
+	{
+		<input id="@FieldName"
+			   type="checkbox"
+			   class="form-check-input"
+			   checked="@(Value?.ToLower() == "true")"
+			   @onchange="OnCheckboxChanged"
+			   disabled="@IsReadOnly" />
+	}
+	else
+	{
+		<input id="@FieldName"
+			   class="form-control"
+			   type="@InputType"
+			   value="@Value"
+			   @onchange="OnValueChangedInternal"
+			   required="@IsRequired"
+			   readonly="@IsReadOnly" />
+	}
+</div>
+
+
+@code {
+	[Parameter]
+	[EditorRequired]
+	public string FieldName { get; set; }
+
+	[Parameter]
+	[EditorRequired]
+	public string Title { get; set; }
+
+	[Parameter]
+	[EditorRequired]
+	public string Value { get; set; }
+
+	[Parameter]
+	[EditorRequired]
+	public string DataType { get; set; }
+
+	[Parameter]
+	[EditorRequired]
+	public EventCallback<string> ValueChanged { get; set; }
+
+	[Parameter]
+	public bool IsRequired { get; set; }
+
+	[Parameter]
+	public bool IsReadOnly { get; set; }
+
+	
+
+
+	private string InputType => DataType.ToLower() switch
+	{
+		"int" or "decimal" or "numeric"
+			or "float" or "double" => "number",
+
+		"date" or "datetime" => "date",
+
+		_ => "text"
+	};
+
+	private bool IsCheckbox =>
+		DataType.Equals("bool", StringComparison.OrdinalIgnoreCase)
+		|| DataType.Equals("bit", StringComparison.OrdinalIgnoreCase);
+
+	private async Task OnValueChangedInternal(ChangeEventArgs e)
+	{
+		// everything comes back as string
+		await ValueChanged.InvokeAsync(e.Value?.ToString() ?? "");
+	}
+
+	private async Task OnCheckboxChanged(ChangeEventArgs e)
+	{
+		if (e.Value is bool b)
+			await ValueChanged.InvokeAsync(b.ToString());
+	}
+
+
+
+}

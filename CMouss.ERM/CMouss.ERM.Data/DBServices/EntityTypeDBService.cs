@@ -39,7 +39,7 @@ namespace CMouss.ERM.Data.DBServices
             return response;
         }
 
-        public async Task<EntityType> AddAsync(string name, string pluralName)
+        public async Task<EntityType> AddAsync(string name, string pluralName, string postUpdateScript)
         {
             EntityType response = new();
             var entityTypeExist = await _context.EntityTypes
@@ -52,13 +52,14 @@ namespace CMouss.ERM.Data.DBServices
             response.Name = name;
             response.PluralName = pluralName;
             response.IsDeleted = false;
+            response.PostUpdateScript = postUpdateScript;
 
             await _context.EntityTypes.AddAsync(response);
             await _context.SaveChangesAsync();
             return response;
         }
 
-        public async Task<EntityType> UpdateAsync(int id, string name, string pluralName)
+        public async Task<EntityType> UpdateAsync(int id, string name, string pluralName , string postUpdateScript)
         {
             EntityType response = new();
             var entityType = await _context.EntityTypes
@@ -69,6 +70,7 @@ namespace CMouss.ERM.Data.DBServices
             }
             entityType.Name = name;
             entityType.PluralName = pluralName;
+            entityType.PostUpdateScript = postUpdateScript;
             await _context.SaveChangesAsync();
             return entityType;
         }

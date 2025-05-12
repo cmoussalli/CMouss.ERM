@@ -16,6 +16,7 @@ namespace CMouss.ERM.Serving.Adapters
             response.Id = model.Id;
             response.Name = model.Name;
             response.PluralName = model.PluralName;
+            response.PostUpdateScript = model.PostUpdateScript;
             response.IsDeleted = model.IsDeleted;
 
             if (model.EntityFields is not null) { new EntityFieldAdapter().Convert(model.EntityFields); }

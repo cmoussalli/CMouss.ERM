@@ -45,10 +45,10 @@ namespace CMouss.ERM.Serving
             return result;
         }
 
-        public async Task<EntityType> AddAsync(string name, string pluralName)
+        public async Task<EntityType> AddAsync(string name, string pluralName, string postUpdateScript)
         {
             EntityType result = new();
-            Data.DBModels.EntityType et = await dbService.EntityTypeDBService.AddAsync(name, pluralName);
+            Data.DBModels.EntityType et = await dbService.EntityTypeDBService.AddAsync(name, pluralName, postUpdateScript);
             if (et != null)
             {
                 result = new Adapters.EntityTypeAdapter().Convert(et);
@@ -56,10 +56,10 @@ namespace CMouss.ERM.Serving
             return result;
         }
 
-        public async Task<EntityType> UpdateAsync(int id, string name, string pluralName)
+        public async Task<EntityType> UpdateAsync(int id, string name, string pluralName, string postUpdateScript)
         {
             EntityType result = new();
-            Data.DBModels.EntityType et = await dbService.EntityTypeDBService.UpdateAsync(id, name, pluralName);
+            Data.DBModels.EntityType et = await dbService.EntityTypeDBService.UpdateAsync(id, name, pluralName, postUpdateScript);
             if (et != null)
             {
                 result = new Adapters.EntityTypeAdapter().Convert(et);

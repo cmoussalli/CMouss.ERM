@@ -6,11 +6,12 @@
 @using System.Threading.Tasks;
 @using Microsoft.CodeAnalysis.CSharp.Scripting;
 @using Microsoft.CodeAnalysis.Scripting;
+@using System.Text.Json;
 
 
 @inject NavigationManager NavigationManager
 
-
+<button @onclick="Save">Save</button>
 
 <h3>Record Details</h3>
 
@@ -29,7 +30,9 @@ else if (record == null)
 else
 {
 
-	<input type="text" @bind-value="userCode" width="100%" />
+	<InputTextArea @bind-value="userCode" width="100%" />
+
+
 	<h3>@userCodeResult</h3>
 	<button @onclick="Test">Execute</button>
 
@@ -62,7 +65,10 @@ else
 					{
 						<tr>
 							<td>@fv.EntityField?.Name</td>
-							<td>@fv.FieldValue</td>
+							<td>
+
+								<FieldEditor Title="@fv.EntityField.Name" DataType="text" FieldName="@fv.EntityField.Name" Value="@fv.FieldValue" ValueChanged="v => fv.FieldValue = v " />
+							</td>
 							<td>@fv.EntityField.DataType.Id \ @fv.EntityField.DataType.Name</td>
 						</tr>
 					}
@@ -121,6 +127,7 @@ else
 	string userCode = "";
 	string userCodeResult = "";
 
+	string logText = "";
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -163,14 +170,55 @@ else
 			isLoading = false;
 		}
 	}
+
+	private async Task Save()
+	{
+		try
+		{
+			if (record != null)
+			{
+				//Todo: Save record data and RecordFieldValues
+				await Test();
+				string r = "";
+				foreach (var v in record.RecordFieldValues)
+				{
+					r = r + v.EntityField.Name + " = " + v.FieldValue + "\n";
+				}
+				userCodeResult = r;
+
+				errorMessage = "";
+			}
+			else
+			{
+				errorMessage = "No record to save.";
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = $"Error saving record: {ex.Message}";
+		}
+		finally
+		{
+			isLoading = false;
+		}
+	}
+
+
+
+
 	public class Globals
 	{
-		public dynamic input { get; set; }
+		public dynamic r { get; set; }
 	}
 
 
 	public async Task Test()
 	{
+		userCode = record.EntityType.PostUpdateScript;
+		if (string.IsNullOrEmpty(userCode))
+		{
+			return;
+		}
 		dynamic fields = new ExpandoObject();
 		var fieldsDict = (IDictionary<string, object>)fields;
 
@@ -191,7 +239,7 @@ else
 						)
 						.WithImports("System", "System.Linq", "System.Dynamic");
 
-			var globs = new Globals { input = fields };
+			var globs = new Globals { r = fields };
 
 			await CSharpScript.EvaluateAsync(
 				userCode,
@@ -200,15 +248,45 @@ else
 			);
 
 			// 4. Output the result
-			userCodeResult = fields.FullName;
+			userCodeResult = fields.Email;
+			foreach (var field in record.RecordFieldValues)
+			{
+				if (fieldsDict.ContainsKey(field.EntityField.Name))
+				{
+					if (field.FieldValue != fieldsDict[field.EntityField.Name].ToString())
+					{
+						field.FieldValue = fieldsDict[field.EntityField.Name]?.ToString() ?? "";
+					}
+				}
+			}
 		}
 		catch (Exception ex)
 		{
 			userCodeResult = ex.Message;
 		}
+		StateHasChanged();
 	}
 
 
+
+
+
+	private decimal? GetDecimal(RecordFieldValue fv)
+		=> decimal.TryParse(fv.FieldValue, out var d) ? d : null;
+	private void SetDecimal(RecordFieldValue fv, decimal? value)
+			=> fv.FieldValue = value?.ToString() ?? "";
+
+	// Helper to get/set a DateTime value from the string
+	private DateTime? GetDate(RecordFieldValue fv)
+			=> DateTime.TryParse(fv.FieldValue, out var dt) ? dt : null;
+	private void SetDate(RecordFieldValue fv, DateTime? value)
+			=> fv.FieldValue = value?.ToString("o") ?? "";
+
+	// Helper to get/set a bool value from the string
+	private bool GetBool(RecordFieldValue fv)
+			=> bool.TryParse(fv.FieldValue, out var b) && b;
+	private void SetBool(RecordFieldValue fv, bool value)
+			=> fv.FieldValue = value.ToString();
 
 
 }
