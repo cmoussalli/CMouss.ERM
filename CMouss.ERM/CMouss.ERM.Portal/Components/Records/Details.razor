@@ -14,6 +14,8 @@
 <button @onclick="Save">Save</button>
 
 <button @onclick="Add">Add</button>
+<button @onclick="Update">Update</button>
+
 
 <h3>Record Details</h3>
 
@@ -277,8 +279,8 @@ else
 
             await dBService.RecordDBService.AddAsync(1, Guid.NewGuid().ToString()
                     , new List<RecordValue_Save>(){
-                new RecordValue_Save(1,"AA"),
-                new RecordValue_Save(2,"BB"),
+                new RecordValue_Save(1,"A"),
+                new RecordValue_Save(2,"B"),
                     },
                     new List<RecordRelation_Save>(){
                 new RecordRelation_Save(1,new(){ 3})
@@ -298,6 +300,33 @@ else
 
     }
 
+
+    public async Task Update()
+    {
+        try
+        {
+            await dBService.RecordDBService.UpdateAsync(4, Guid.NewGuid().ToString()
+                    , new List<RecordValue_Save>(){
+                new RecordValue_Save(4,"Corp 1"),
+                    },
+                    new List<RecordRelation_Save>()
+                    {
+                new RecordRelation_Save(1,new(){ 2})
+                    }
+                    ,
+                    "",
+                    ""
+                );
+        }
+        catch(Exception ex)
+        {
+            errorMessage = $"Error saving record: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 
 
     private decimal? GetDecimal(RecordFieldValue fv)

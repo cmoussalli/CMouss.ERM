@@ -254,7 +254,7 @@ namespace CMouss.ERM.Data.DBServices
             return record;
             }
 
-        public async Task<Record> UpdateAsync(int id, List<RecordValue_Save> recordValues, List<RecordRelation_Save> recordRelations, string userId)
+        public async Task<Record> UpdateAsync(int id, string name, List<RecordValue_Save> newRecordValues, List<RecordRelation_Save> recordRelations, string ownerUserId, string userId)
         {
             var record = await _context.Records
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -262,20 +262,21 @@ namespace CMouss.ERM.Data.DBServices
             {
                 throw new Exception("Record not found");
             }
-            if (recordValues == null) {
+            if (newRecordValues == null) {
                 throw new Exception("Record values cannot be null");
             }
 
-            //Get the old RecordFieldValues
-            var oldRecordValues = await _context.RecordFieldValues
-                .Where(x => x.RecordId == id)
-                .ToListAsync();
-
-
             //Make sure that all required fields are set
-            foreach (var field in record.EntityType.EntityFields.Where(x => x.IsRequired))
+            var entityType = await _context.EntityTypes
+                .Include(x => x.EntityFields)
+                .FirstOrDefaultAsync(x => x.Id == record.EntityTypeId);
+            if (entityType == null)
+                {
+                throw new Exception("Entity Type not found");
+            }
+            foreach (var field in entityType.EntityFields.Where(x => x.IsRequired))
             {
-                var recordValue = recordValues.FirstOrDefault(x => x.EntityFieldId == field.Id);
+                var recordValue = newRecordValues.FirstOrDefault(x => x.EntityFieldId == field.Id);
                 if (recordValue == null || string.IsNullOrWhiteSpace(recordValue.Value))
                 {
                     throw new Exception($"Field {field.Name} is required");
@@ -283,7 +284,7 @@ namespace CMouss.ERM.Data.DBServices
             }
 
             //Check if all fields are valid
-            foreach (var recordValue in recordValues)
+            foreach (var recordValue in newRecordValues)
             {
                 var field = await _context.EntityFields
                     .FirstOrDefaultAsync(x => x.Id == recordValue.EntityFieldId && x.EntityTypeId == record.EntityTypeId);
@@ -293,16 +294,128 @@ namespace CMouss.ERM.Data.DBServices
                 }
             }
 
-            //Todo: Check if the record name is unique
-
-            //Update the record values, by first adding the new values and then removing the old ones, adding process is done by sending the range of values
 
 
+            //Get the old RecordFieldValues
+            var oldRecordValues = await _context.RecordFieldValues
+                .Where(x => x.RecordId == id)
+                .ToListAsync();
+
+            var oldRecordRelations = await _context.RecordRelations
+                .Where(x => x.LeftRecordId == id)
+                .ToListAsync();
+
+            //Compare oldRecordValues with the new values in recordValues param and update the ones that are different, delete the ones that are not in the new recordValues and add the new ones
+            foreach (var recordValue in newRecordValues)
+            {
+                var oldRecordValue = oldRecordValues.FirstOrDefault(x => x.EntityFieldId == recordValue.EntityFieldId);
+                if (oldRecordValue != null)
+                {
+                    //Update the old value with the new one
+                    oldRecordValue.FieldValue = recordValue.Value;
+                }
+                else
+                {
+                    //Add the new value
+                    RecordFieldValue newFieldValue = new()
+                    {
+                        RecordId = id,
+                        EntityFieldId = recordValue.EntityFieldId,
+                        FieldValue = recordValue.Value
+                    };
+                    await _context.RecordFieldValues.AddAsync(newFieldValue);
+                }
+            }
+            //Delete the old values that are not in the new recordValues
+            foreach (var oldRecordValue in oldRecordValues)
+            {
+                var newRecordValue = newRecordValues.FirstOrDefault(x => x.EntityFieldId == oldRecordValue.EntityFieldId);
+                if (newRecordValue == null)
+                {
+                    //Delete the old value
+                    _context.RecordFieldValues.Remove(oldRecordValue);
+                }
+            }
 
 
 
+            //Validate if the recordRelations param is not null and if it contains any values
+            if (recordRelations is not null)
+            {
+                if (recordRelations.Count > 0)
+                {
+
+                    //Validate if the recordRelations are valid by checking if the entity relation exists and Record.Relation.EntityTypeId is the same as the record.EntityTypeId
+                    foreach (var recordRelation in recordRelations)
+                    {
+                        var entityRelation = await _context.EntityRelations
+                            .FirstOrDefaultAsync(x => x.Id == recordRelation.EntityRelationId);
+                        if (entityRelation == null)
+                        {
+                            throw new Exception($"Entity Relation with ID {recordRelation.EntityRelationId} does not exist");
+                        }
+                        if ((entityRelation.EntityTypeId_Right != record.EntityTypeId) && (entityRelation.EntityTypeId_Left != record.EntityTypeId))
+                        {
+                            throw new Exception($"Entity Relation with ID {recordRelation.EntityRelationId} is not valid for the record with ID {id}");
+                        }
+                    }
+
+                    //Validate if the recordRelations are valid by checking if the recordRelation.RecordIds exist in the database, don't user Foreach loop for this, use a single query to check if all records exist
+                    var recordIds = recordRelations.SelectMany(x => x.RecordIds).Distinct().ToList();
+                    var records = await _context.Records
+                        .Where(x => recordIds.Contains(x.Id))
+                        .ToListAsync();
+                    if (records.Count != recordIds.Count)
+                        {
+                        throw new Exception("One or more records do not exist");
+                    }
 
 
+
+                    //Compare oldRecordRelations with the new values in recordRelations param and update the ones that are different, delete the ones that are not in the new recordRelations and add the new ones
+                    foreach (var recordRelation in recordRelations)
+                    {
+                        var oldRecordRelation = oldRecordRelations.FirstOrDefault(x => x.EntityRelationId == recordRelation.EntityRelationId);
+                        
+                        if (oldRecordRelation != null)
+                        {
+                            //Update the old value with the new one
+                            oldRecordRelation.RightRecordId = recordRelation.RecordIds.FirstOrDefault();
+                        }
+                        else
+                        {
+                            //Add the new value
+                            RecordRelation newRecordRelation = new()
+                            {
+                                EntityRelationId = recordRelation.EntityRelationId,
+                                LeftRecordId = id,
+                                RightRecordId = recordRelation.RecordIds.FirstOrDefault(),
+                                CreateUserId = userId,
+                                CreateDateTime = DateTime.UtcNow
+                            };
+                            await _context.RecordRelations.AddAsync(newRecordRelation);
+                        }
+                    }
+                    //Delete the old values that are not in the new recordRelations
+                    foreach (var oldRecordRelation in oldRecordRelations)
+                    {
+                        var newRecordRelation = recordRelations.FirstOrDefault(x => x.EntityRelationId == oldRecordRelation.EntityRelationId);
+                        if (newRecordRelation == null)
+                        {
+                            //Delete the old value
+                            _context.RecordRelations.Remove(oldRecordRelation);
+                        }
+                    }
+                }
+                
+            }
+
+            
+
+
+            //Update the record with the new values
+            record.Name = name;
+            record.OwnerUserId = ownerUserId;
             record.LastUpdateUserId = userId;
             record.LastUpdate = DateTime.UtcNow;
             record.IterationId += 1;

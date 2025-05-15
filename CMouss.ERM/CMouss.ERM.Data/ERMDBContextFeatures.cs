@@ -348,7 +348,27 @@ namespace CMouss.ERM.Data
             };
             RecordFieldValues.Add(recordFieldValue7);
 
+            Record record4 = new()
+            {
+                Id = 4,
+                Name = "ACME2 Corp",
+                EntityTypeId = 2,
+                CreateDateTime = DateTime.Now,
+                LastUpdate = DateTime.Now,
+                CreateUserId = "",
+                OwnerUserId = "",
+                LastUpdateUserId = ""
+            };
+            Records.Add(record4);
 
+            RecordFieldValue recordFieldValue8 = new()
+            {
+                Id = 8,
+                RecordId = 4,
+                EntityFieldId = 4,
+                FieldValue = "ACME2 Corp",
+            };
+            RecordFieldValues.Add(recordFieldValue8);
 
 
 
