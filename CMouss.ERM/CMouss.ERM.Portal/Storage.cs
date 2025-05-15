@@ -1,14 +1,14 @@
-﻿using CMouss.ERM.Serving;
+﻿//using CMouss.ERM.Serving;
 
-namespace CMouss.ERM.Portal
-{
-    public static class Storage
-    {
+//namespace CMouss.ERM.Portal
+//{
+//    public static class Storage
+//    {
 
-        public static ERMServingHub ERM { get; set; }
-
-
+//        public static ERMServingHub ERM { get; set; }
 
 
-    }
-}
+
+
+//    }
+//}

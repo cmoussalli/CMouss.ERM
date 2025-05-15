@@ -15,7 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CMouss.ERM.APIModels\CMouss.ERM.APIModels.csproj" />
     <ProjectReference Include="..\CMouss.ERM.Data\CMouss.ERM.Data.csproj" />
-    <ProjectReference Include="..\CMouss.ERM.Serving\CMouss.ERM.Serving.csproj" />
   </ItemGroup>
 
   <ItemGroup>

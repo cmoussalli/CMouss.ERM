@@ -123,7 +123,6 @@ namespace CMouss.ERM.Data.DBServices
 
 
 
-
         public async Task<Record> GetByIdAsync(int id)
         {
             Record response = new();
@@ -158,8 +157,48 @@ namespace CMouss.ERM.Data.DBServices
             return response;
         }
 
-        public async Task<Record> AddAsync(int entityTypeId, string userId)
+
+
+        public async Task<Record> AddAsync(int entityTypeId, string name, List<RecordValue_Save> recordValues, List<RecordRelation_Save> recordRelations,string ownerUserId, string userId)
         {
+            //Check if entity type exists
+            var entityType = await _context.EntityTypes
+                .Include(x => x.EntityFields)
+                .FirstOrDefaultAsync(x => x.Id == entityTypeId);
+            if (entityType == null)
+            {
+                throw new Exception("Entity Type not found");
+            }
+
+            //Make sure that all required fields are set
+            foreach (var field in entityType.EntityFields.Where(x => x.IsRequired))
+            {
+                var recordValue = recordValues.FirstOrDefault(x => x.EntityFieldId == field.Id);
+                if (recordValue == null || string.IsNullOrWhiteSpace(recordValue.Value))
+                {
+                    throw new Exception($"Field {field.Name} is required");
+                }
+            }
+
+            //Check if all fields are valid
+            foreach (var recordValue in recordValues)
+            {
+                var field = await _context.EntityFields
+                    .FirstOrDefaultAsync(x => x.Id == recordValue.EntityFieldId && x.EntityTypeId == entityTypeId);
+                if (field == null)
+                {
+                    throw new Exception($"Field with ID {recordValue.EntityFieldId} does not exist in Entity Type {entityTypeId}");
+                }
+            }
+
+            //TODO: Check if the record name is unique
+
+            //TODO: Check if the record values are valid, by checking the data type of the field and the value
+
+
+
+
+            //Create new record
             Record record = new()
             {
                 EntityTypeId = entityTypeId,
@@ -167,15 +206,55 @@ namespace CMouss.ERM.Data.DBServices
                 CreateDateTime = DateTime.UtcNow,
                 LastUpdateUserId = userId,
                 LastUpdate = DateTime.UtcNow,
-                OwnerUserId = userId
-            };
+                IterationId = 1,
+                OwnerUserId = ownerUserId,
+                IsDeleted = false,
+                Name = name 
 
+            };
             await _context.Records.AddAsync(record);
             await _context.SaveChangesAsync();
-            return record;
-        }
 
-        public async Task<Record> UpdateAsync(int id, string userId)
+            //Add field values to the new record by sending the range of values
+            List<RecordFieldValue> recordFieldValues = new();
+            foreach (var recordValue in recordValues)
+            {
+                var fieldValue = new RecordFieldValue()
+                {
+                    RecordId = record.Id,
+                    EntityFieldId = recordValue.EntityFieldId,
+                    FieldValue = recordValue.Value
+                };
+                recordFieldValues.Add(fieldValue);
+            }
+            await _context.RecordFieldValues.AddRangeAsync(recordFieldValues);
+            await _context.SaveChangesAsync();
+
+
+            //Add relations to the new record by sending the range of values
+            List<RecordRelation> recordRelationsList = new();
+            foreach (var relation in recordRelations)
+            {
+                foreach (var relationRecord in relation.RecordIds)
+                {
+                    var recordRelation = new RecordRelation()
+                    {
+                        EntityRelationId = relation.EntityRelationId,
+                        LeftRecordId = record.Id,
+                        RightRecordId = relationRecord,
+                        CreateUserId = userId,
+                        CreateDateTime = DateTime.UtcNow
+                    };
+                    recordRelationsList.Add(recordRelation);
+                }
+            }
+            await _context.RecordRelations.AddRangeAsync(recordRelationsList);
+            _context.SaveChanges();
+
+            return record;
+            }
+
+        public async Task<Record> UpdateAsync(int id, List<RecordValue_Save> recordValues, List<RecordRelation_Save> recordRelations, string userId)
         {
             var record = await _context.Records
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -183,10 +262,50 @@ namespace CMouss.ERM.Data.DBServices
             {
                 throw new Exception("Record not found");
             }
+            if (recordValues == null) {
+                throw new Exception("Record values cannot be null");
+            }
+
+            //Get the old RecordFieldValues
+            var oldRecordValues = await _context.RecordFieldValues
+                .Where(x => x.RecordId == id)
+                .ToListAsync();
+
+
+            //Make sure that all required fields are set
+            foreach (var field in record.EntityType.EntityFields.Where(x => x.IsRequired))
+            {
+                var recordValue = recordValues.FirstOrDefault(x => x.EntityFieldId == field.Id);
+                if (recordValue == null || string.IsNullOrWhiteSpace(recordValue.Value))
+                {
+                    throw new Exception($"Field {field.Name} is required");
+                }
+            }
+
+            //Check if all fields are valid
+            foreach (var recordValue in recordValues)
+            {
+                var field = await _context.EntityFields
+                    .FirstOrDefaultAsync(x => x.Id == recordValue.EntityFieldId && x.EntityTypeId == record.EntityTypeId);
+                if (field == null)
+                {
+                    throw new Exception($"Field with ID {recordValue.EntityFieldId} does not exist in Entity Type {record.EntityTypeId}");
+                }
+            }
+
+            //Todo: Check if the record name is unique
+
+            //Update the record values, by first adding the new values and then removing the old ones, adding process is done by sending the range of values
+
+
+
+
+
+
 
             record.LastUpdateUserId = userId;
             record.LastUpdate = DateTime.UtcNow;
-
+            record.IterationId += 1;
             await _context.SaveChangesAsync();
             return record;
         }
@@ -211,31 +330,14 @@ namespace CMouss.ERM.Data.DBServices
         public async Task<bool> DeleteAsync(int id)
         {
             var record = await _context.Records
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id && x.IsDeleted == false);
             if (record == null)
             {
                 throw new Exception("Record not found");
             }
 
-            // Delete related RecordFieldValues
-            var recordFieldValues = await _context.RecordFieldValues
-                .Where(x => x.RecordId == id)
-                .ToListAsync();
-            if (recordFieldValues.Any())
-            {
-                _context.RecordFieldValues.RemoveRange(recordFieldValues);
-            }
+            record.IsDeleted = true;
 
-            // Delete related RecordRelations
-            var recordRelations = await _context.RecordRelations
-                .Where(x => x.LeftRecordId == id || x.RightRecordId == id)
-                .ToListAsync();
-            if (recordRelations.Any())
-            {
-                _context.RecordRelations.RemoveRange(recordRelations);
-            }
-
-            _context.Records.Remove(record);
             await _context.SaveChangesAsync();
             return true;
         }

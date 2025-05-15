@@ -16,6 +16,11 @@ namespace CMouss.ERM.Data.DBModels
         public DateTime CreateDateTime { get; set; }
         public string LastUpdateUserId { get; set; }
         public DateTime LastUpdate { get; set; }
+
+        public int IterationId { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
+
         public string OwnerUserId { get; set; }
         //public Dictionary<string, object> FieldValues { get; set; } = new Dictionary<string, object>();
 
@@ -93,5 +98,31 @@ namespace CMouss.ERM.Data.DBModels
 
     }
 
+
+    public class RecordValue_Save
+    {
+        public int EntityFieldId { get; set; }
+        public string Value { get; set; }
+
+        public RecordValue_Save(int entityFieldId, string value)
+        {
+            EntityFieldId = entityFieldId;
+            Value = value;
+        }
+    }
+
+
+    public class RecordRelation_Save
+    {
+        public int EntityRelationId { get; set; }
+        public List<int> RecordIds { get; set; } = new();
+
+        public RecordRelation_Save(int entityRelationId, List<int> recordIds)
+        {
+            EntityRelationId = entityRelationId;
+            RecordIds = recordIds;
+        }
+    }
+    
 
 }

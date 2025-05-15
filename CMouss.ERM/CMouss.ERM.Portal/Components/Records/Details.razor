@@ -13,280 +13,309 @@
 
 <button @onclick="Save">Save</button>
 
+<button @onclick="Add">Add</button>
+
 <h3>Record Details</h3>
 
 @if (isLoading)
 {
-	<p>Loading...</p>
+    <p>Loading...</p>
 }
 else if (!string.IsNullOrEmpty(errorMessage))
 {
-	<p class="text-danger">@errorMessage</p>
+    <p class="text-danger">@errorMessage</p>
 }
 else if (record == null)
 {
-	<p>Record not found.</p>
+    <p>Record not found.</p>
 }
 else
 {
 
-	<InputTextArea @bind-value="userCode" width="100%" />
+    <InputTextArea @bind-value="userCode" width="100%" />
 
 
-	<h3>@userCodeResult</h3>
-	<button @onclick="Test">Execute</button>
+    <h3>@userCodeResult</h3>
+    <button @onclick="Test">Execute</button>
 
 
 
-	<div>
-		<h4>Record ID: @record.Id</h4>
-		<p><strong>Entity Type:</strong> @record.EntityType?.Name</p>
-		<p><strong>Created By:</strong> @record.CreateUserId on @record.CreateDateTime.ToLocalTime()</p>
-		<p><strong>Last Updated By:</strong> @record.LastUpdateUserId on @record.LastUpdate.ToLocalTime()</p>
-		<p><strong>Owner User ID:</strong> @record.OwnerUserId</p>
+    <div>
+        <h4>Record ID: @record.Id</h4>
+        <p><strong>Entity Type:</strong> @record.EntityType?.Name</p>
+        <p><strong>Created By:</strong> @record.CreateUserId on @record.CreateDateTime.ToLocalTime()</p>
+        <p><strong>Last Updated By:</strong> @record.LastUpdateUserId on @record.LastUpdate.ToLocalTime()</p>
+        <p><strong>Owner User ID:</strong> @record.OwnerUserId</p>
 
-		<h5>Field Values</h5>
-		@if (record.RecordFieldValues.Count == 0)
-		{
-			<p>No field values found.</p>
-		}
-		else
-		{
-			<table class="table table-striped">
-				<thead>
-					<tr>
-						<th>Field Name</th>
-						<th>Value</th>
-						<th>Data Type</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var fv in record.RecordFieldValues)
-					{
-						<tr>
-							<td>@fv.EntityField?.Name</td>
-							<td>
+        <h5>Field Values</h5>
+        @if (record.RecordFieldValues.Count == 0)
+        {
+            <p>No field values found.</p>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Value</th>
+                        <th>Data Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var fv in record.RecordFieldValues)
+                    {
+                        <tr>
+                            <td>@fv.EntityField?.Name</td>
+                            <td>
 
-								<FieldEditor Title="@fv.EntityField.Name" DataType="text" FieldName="@fv.EntityField.Name" Value="@fv.FieldValue" ValueChanged="v => fv.FieldValue = v " />
-							</td>
-							<td>@fv.EntityField.DataType.Id \ @fv.EntityField.DataType.Name</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		}
+                                <FieldEditor Title="@fv.EntityField.Name" DataType="text" FieldName="@fv.EntityField.Name" Value="@fv.FieldValue" ValueChanged="v => fv.FieldValue = v" />
+                            </td>
+                            <td>@fv.EntityField.DataType.Id \ @fv.EntityField.DataType.Name</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
 
-		<h5>Relations</h5>
-		@if (record.Relations.Count == 0)
-		{
-			<p>No source relations found.</p>
-		}
-		else
-		{
+        <h5>Relations</h5>
+        @if (record.Relations.Count == 0)
+        {
+            <p>No source relations found.</p>
+        }
+        else
+        {
 
-			@foreach (var rel in record.Relations)
-			{
-				<h6>Relation: @rel.RelationTitle</h6>
-				<table class="table table-striped">
-					<thead>
-						<tr>
-							<th>Record ID</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach (var destRec in rel.Records)
-						{
-							<tr>
-								<td>@destRec.Id</td>
-								<td>@destRec.Name</td>
-							</tr>
-						}
+            @foreach (var rel in record.Relations)
+            {
+                <h6>Relation: @rel.RelationTitle</h6>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Record ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var destRec in rel.Records)
+                        {
+                            <tr>
+                                <td>@destRec.Id</td>
+                                <td>@destRec.Name</td>
+                            </tr>
+                        }
 
-					</tbody>
-				</table>
-			}
-		}
+                    </tbody>
+                </table>
+            }
+        }
 
 
-	</div>
+    </div>
 }
 
 
 
 @code {
-	[Parameter]
-	[SupplyParameterFromQuery(Name = "id")]
-	public int RecordId { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "id")]
+    public int RecordId { get; set; }
 
-	private Record? record;
-	private bool isLoading = true;
-	private string? errorMessage;
+    private Record? record;
+    private bool isLoading = true;
+    private string? errorMessage;
 
-	DBService dBService = new();
+    DBService dBService = new();
 
-	string userCode = "";
-	string userCodeResult = "";
+    string userCode = "";
+    string userCodeResult = "";
 
-	string logText = "";
+    string logText = "";
 
-	protected override async Task OnParametersSetAsync()
-	{
-		if (RecordId <= 0)
-		{
-			errorMessage = "Invalid record ID.";
-			isLoading = false;
-			return;
-		}
+    protected override async Task OnParametersSetAsync()
+    {
+        if (RecordId <= 0)
+        {
+            errorMessage = "Invalid record ID.";
+            isLoading = false;
+            return;
+        }
 
-		try
-		{
-			isLoading = true;
-			errorMessage = null;
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
 
-			// Load the record with related data
-			record = await dBService.RecordDBService.GetByIdWithRelationsAsync(RecordId);
-			if (record == null)
-			{
-				errorMessage = $"Record with ID {RecordId} not found.";
-				isLoading = false;
-				return;
-			}
+            // Load the record with related data
+            record = await dBService.RecordDBService.GetByIdWithRelationsAsync(RecordId);
+            if (record == null)
+            {
+                errorMessage = $"Record with ID {RecordId} not found.";
+                isLoading = false;
+                return;
+            }
 
-			// Load field values
-			// fieldValues = await RecordFieldValueService.GetByRecordIdAsync(RecordId);
+            // Load field values
+            // fieldValues = await RecordFieldValueService.GetByRecordIdAsync(RecordId);
 
-			// // Load relations where this record is source
-			// sourceRelations = await RecordRelationService.GetBySourceRecordIdAsync(RecordId);
+            // // Load relations where this record is source
+            // sourceRelations = await RecordRelationService.GetBySourceRecordIdAsync(RecordId);
 
-			// // Load relations where this record is destination
-			// destinationRelations = await RecordRelationService.GetByDestinationRecordIdAsync(RecordId);
-		}
-		catch (Exception ex)
-		{
-			errorMessage = $"Error loading record details: {ex.Message}";
-		}
-		finally
-		{
-			isLoading = false;
-		}
-	}
+            // // Load relations where this record is destination
+            // destinationRelations = await RecordRelationService.GetByDestinationRecordIdAsync(RecordId);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading record details: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 
-	private async Task Save()
-	{
-		try
-		{
-			if (record != null)
-			{
-				//Todo: Save record data and RecordFieldValues
-				await Test();
-				string r = "";
-				foreach (var v in record.RecordFieldValues)
-				{
-					r = r + v.EntityField.Name + " = " + v.FieldValue + "\n";
-				}
-				userCodeResult = r;
+    private async Task Save()
+    {
+        try
+        {
+            if (record != null)
+            {
+                //Todo: Save record data and RecordFieldValues
+                await Test();
+                string r = "";
+                foreach (var v in record.RecordFieldValues)
+                {
+                    r = r + v.EntityField.Name + " = " + v.FieldValue + "\n";
+                }
+                userCodeResult = r;
 
-				errorMessage = "";
-			}
-			else
-			{
-				errorMessage = "No record to save.";
-			}
-		}
-		catch (Exception ex)
-		{
-			errorMessage = $"Error saving record: {ex.Message}";
-		}
-		finally
-		{
-			isLoading = false;
-		}
-	}
-
-
-
-
-	public class Globals
-	{
-		public dynamic r { get; set; }
-	}
-
-
-	public async Task Test()
-	{
-		userCode = record.EntityType.PostUpdateScript;
-		if (string.IsNullOrEmpty(userCode))
-		{
-			return;
-		}
-		dynamic fields = new ExpandoObject();
-		var fieldsDict = (IDictionary<string, object>)fields;
-
-		foreach (var field in record.RecordFieldValues)
-		{
-			fieldsDict[field.EntityField.Name] = field.FieldValue;
-		}
-
-		try
-		{
-			// 3. Execute user's code
-			var scriptOptions = ScriptOptions.Default
-					.WithReferences(
-					typeof(object).Assembly,                  // System.Private.CoreLib
-					typeof(Enumerable).Assembly,              // System.Linq
-					typeof(System.Dynamic.DynamicObject).Assembly, // System.Dynamic
-					typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly // <-- This is the key!
-						)
-						.WithImports("System", "System.Linq", "System.Dynamic");
-
-			var globs = new Globals { r = fields };
-
-			await CSharpScript.EvaluateAsync(
-				userCode,
-				scriptOptions,
-				globals: globs
-			);
-
-			// 4. Output the result
-			userCodeResult = fields.Email;
-			foreach (var field in record.RecordFieldValues)
-			{
-				if (fieldsDict.ContainsKey(field.EntityField.Name))
-				{
-					if (field.FieldValue != fieldsDict[field.EntityField.Name].ToString())
-					{
-						field.FieldValue = fieldsDict[field.EntityField.Name]?.ToString() ?? "";
-					}
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			userCodeResult = ex.Message;
-		}
-		StateHasChanged();
-	}
+                errorMessage = "";
+            }
+            else
+            {
+                errorMessage = "No record to save.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error saving record: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 
 
 
 
+    public class Globals
+    {
+        public dynamic r { get; set; }
+    }
 
-	private decimal? GetDecimal(RecordFieldValue fv)
-		=> decimal.TryParse(fv.FieldValue, out var d) ? d : null;
-	private void SetDecimal(RecordFieldValue fv, decimal? value)
-			=> fv.FieldValue = value?.ToString() ?? "";
 
-	// Helper to get/set a DateTime value from the string
-	private DateTime? GetDate(RecordFieldValue fv)
-			=> DateTime.TryParse(fv.FieldValue, out var dt) ? dt : null;
-	private void SetDate(RecordFieldValue fv, DateTime? value)
-			=> fv.FieldValue = value?.ToString("o") ?? "";
+    public async Task Test()
+    {
+        userCode = record.EntityType.PostUpdateScript;
+        if (string.IsNullOrEmpty(userCode))
+        {
+            return;
+        }
+        dynamic fields = new ExpandoObject();
+        var fieldsDict = (IDictionary<string, object>)fields;
 
-	// Helper to get/set a bool value from the string
-	private bool GetBool(RecordFieldValue fv)
-			=> bool.TryParse(fv.FieldValue, out var b) && b;
-	private void SetBool(RecordFieldValue fv, bool value)
-			=> fv.FieldValue = value.ToString();
+        foreach (var field in record.RecordFieldValues)
+        {
+            fieldsDict[field.EntityField.Name] = field.FieldValue;
+        }
+
+        try
+        {
+            // 3. Execute user's code
+            var scriptOptions = ScriptOptions.Default
+                    .WithReferences(
+                    typeof(object).Assembly,                  // System.Private.CoreLib
+                    typeof(Enumerable).Assembly,              // System.Linq
+                    typeof(System.Dynamic.DynamicObject).Assembly, // System.Dynamic
+                    typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly // <-- This is the key!
+                        )
+                        .WithImports("System", "System.Linq", "System.Dynamic");
+
+            var globs = new Globals { r = fields };
+
+            await CSharpScript.EvaluateAsync(
+                userCode,
+                scriptOptions,
+                globals: globs
+            );
+
+            // 4. Output the result
+            userCodeResult = fields.Email;
+            foreach (var field in record.RecordFieldValues)
+            {
+                if (fieldsDict.ContainsKey(field.EntityField.Name))
+                {
+                    if (field.FieldValue != fieldsDict[field.EntityField.Name].ToString())
+                    {
+                        field.FieldValue = fieldsDict[field.EntityField.Name]?.ToString() ?? "";
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            userCodeResult = ex.Message;
+        }
+        StateHasChanged();
+    }
+
+
+    public async Task Add()
+    {
+        try
+        {
+
+            await dBService.RecordDBService.AddAsync(1, Guid.NewGuid().ToString()
+                    , new List<RecordValue_Save>(){
+                new RecordValue_Save(1,"AA"),
+                new RecordValue_Save(2,"BB"),
+                    },
+                    new List<RecordRelation_Save>(){
+                new RecordRelation_Save(1,new(){ 3})
+                    },
+                    "",
+                    ""
+                );
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error saving record: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+
+    }
+
+
+
+    private decimal? GetDecimal(RecordFieldValue fv)
+        => decimal.TryParse(fv.FieldValue, out var d) ? d : null;
+    private void SetDecimal(RecordFieldValue fv, decimal? value)
+            => fv.FieldValue = value?.ToString() ?? "";
+
+    // Helper to get/set a DateTime value from the string
+    private DateTime? GetDate(RecordFieldValue fv)
+            => DateTime.TryParse(fv.FieldValue, out var dt) ? dt : null;
+    private void SetDate(RecordFieldValue fv, DateTime? value)
+            => fv.FieldValue = value?.ToString("o") ?? "";
+
+    // Helper to get/set a bool value from the string
+    private bool GetBool(RecordFieldValue fv)
+            => bool.TryParse(fv.FieldValue, out var b) && b;
+    private void SetBool(RecordFieldValue fv, bool value)
+            => fv.FieldValue = value.ToString();
 
 
 }
